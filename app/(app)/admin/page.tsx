@@ -33,8 +33,8 @@ export default async function AdminPage() {
   return (
     <div className="p-8 max-w-4xl">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="mt-1 text-sm text-gray-500">Manage repositories, users, and indexing.</p>
+        <h1 className="text-2xl font-bold text-[hsl(var(--app-text))]">Admin Dashboard</h1>
+        <p className="mt-1 text-sm text-[hsl(var(--app-text-muted))]">Manage repositories, users, and indexing.</p>
       </div>
 
       <div className="grid grid-cols-3 gap-4 mb-8">
@@ -94,12 +94,12 @@ export default async function AdminPage() {
           </Button>
         </Link>
       </div>
-      <div className="mt-6 rounded-md border bg-white p-4">
-        <h2 className="text-sm font-semibold text-gray-900">Sync health</h2>
-        <p className="mt-1 text-sm text-gray-600">
+      <div className="mt-6 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--app-surface))] p-4">
+        <h2 className="text-sm font-semibold text-[hsl(var(--app-text))]">Sync health</h2>
+        <p className="mt-1 text-sm text-[hsl(var(--app-text-muted))]">
           Last repository update: {lastSync ? lastSync.toLocaleString() : "N/A"}
         </p>
-        <p className="mt-1 text-sm text-gray-600">Repositories in error state: {errorCount}</p>
+        <p className="mt-1 text-sm text-[hsl(var(--app-text-muted))]">Repositories in error state: {errorCount}</p>
       </div>
     </div>
   );

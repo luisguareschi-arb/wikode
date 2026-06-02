@@ -56,8 +56,8 @@ function ChatComposer({
       )}
       <div
         className={cn(
-          "rounded-2xl border border-gray-200 bg-white shadow-sm",
-          "focus-within:border-gray-300 focus-within:ring-1 focus-within:ring-gray-200",
+          "rounded-xl border border-[hsl(var(--border))] bg-white",
+          "focus-within:border-[hsl(0_0%_80%)]",
           !isEmpty && "relative"
         )}
       >
@@ -73,39 +73,57 @@ function ChatComposer({
           placeholder={placeholder}
           rows={isEmpty ? 4 : 2}
           className={cn(
-            "w-full resize-none rounded-2xl bg-transparent px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none",
+            "w-full resize-none rounded-xl bg-transparent px-4 text-[14px] text-[hsl(var(--app-text))] placeholder:text-[hsl(var(--app-text-muted))] focus:outline-none",
             isEmpty ? "min-h-[100px] pb-2 pt-4" : "min-h-[72px] py-3 pr-12 pb-10"
           )}
         />
         {isEmpty ? (
           <div className="flex items-center justify-between gap-2 px-3 pb-3">
-            <p className={cn("min-w-0 flex-1 truncate text-xs", error ? "text-red-600" : "text-gray-500")}>
+            <p
+              className={cn(
+                "min-w-0 flex-1 truncate text-xs",
+                error ? "text-red-600" : "text-[hsl(var(--app-text-muted))]"
+              )}
+            >
               {error ?? helperText}
             </p>
             <Button
               size="icon"
-              className="h-8 w-8 shrink-0 rounded-full"
+              className="h-8 w-8 shrink-0 rounded-full bg-[hsl(var(--app-text))] text-white hover:bg-[hsl(0_0%_20%)]"
               onClick={() => void onSend()}
               disabled={disabled}
               aria-label={sending ? "Sending" : "Send message"}
             >
-              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+              {sending ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowUp className="h-4 w-4" strokeWidth={2} />
+              )}
             </Button>
           </div>
         ) : (
           <Button
             size="icon"
-            className="absolute bottom-3 right-3 h-8 w-8 rounded-full"
+            className="absolute bottom-3 right-3 h-8 w-8 rounded-full bg-[hsl(var(--app-text))] text-white hover:bg-[hsl(0_0%_20%)]"
             onClick={() => void onSend()}
             disabled={disabled}
             aria-label={sending ? "Sending" : "Send message"}
           >
-            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+            {sending ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ArrowUp className="h-4 w-4" strokeWidth={2} />
+            )}
           </Button>
         )}
       </div>
       {!isEmpty && (error || helperText) && (
-        <p className={cn("mt-1.5 text-center text-xs", error ? "text-red-600" : "text-gray-500")}>
+        <p
+          className={cn(
+            "mt-1.5 text-center text-xs",
+            error ? "text-red-600" : "text-[hsl(var(--app-text-muted))]"
+          )}
+        >
           {error ?? helperText}
         </p>
       )}
@@ -259,27 +277,27 @@ export function ChatWindow({
 
   if (isEmpty) {
     return (
-      <div className="flex h-full flex-1 flex-col items-center justify-center bg-white px-4 py-8">
+      <div className="flex h-full flex-1 flex-col items-center justify-center bg-[hsl(var(--app-surface))] px-4 py-8">
         {composer}
       </div>
     );
   }
 
   return (
-    <div className="flex h-full flex-1 flex-col bg-white">
+    <div className="flex h-full flex-1 flex-col bg-[hsl(var(--app-surface))]">
       <ChatHeader
         title={displayTitle}
         repoIds={repoIds}
         onRepoIdsChange={activeThreadId ? undefined : onRepoIdsChange}
       />
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-3xl space-y-6 px-4 py-6">
+        <div className="mx-auto max-w-3xl space-y-8 px-6 py-6">
           {messages.map((message) => (
             <MessageBubble key={message.id} message={message} />
           ))}
         </div>
       </div>
-      <div className="shrink-0 bg-linear-to-t from-white via-white to-transparent px-4 pb-4 pt-2">
+      <div className="shrink-0 bg-[hsl(var(--app-surface))] px-4 pb-4 pt-3">
         {composer}
       </div>
     </div>

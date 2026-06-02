@@ -51,7 +51,7 @@ export default async function ThreadPage({
   }
 
   return (
-    <div className="flex h-full flex-1 flex-col bg-white">
+    <div className="flex h-full flex-1 flex-col bg-[hsl(var(--app-surface))]">
       <ChatWindow
         key={thread.id}
         threadId={thread.id}

@@ -86,20 +86,20 @@ export function CitationCard({ citation }: { citation: CitationData }) {
   }, [citation]);
 
   return (
-    <div className="mt-2 overflow-hidden rounded-md border border-gray-200 bg-[#f6f8fa]">
-      <div className="flex items-center gap-2 border-b border-gray-200 px-3 py-2">
-        <FileCode2 className="h-4 w-4 shrink-0 text-blue-500" aria-hidden />
-        <span className="truncate text-xs font-medium text-gray-900">{fileName}</span>
-        <span className="shrink-0 text-xs text-gray-500">{lineLabel}</span>
+    <div className="mt-2 overflow-hidden rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--app-code-bg))]">
+      <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] px-3 py-2">
+        <FileCode2 className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]" strokeWidth={1.75} aria-hidden />
+        <span className="truncate text-[13px] font-medium text-[hsl(var(--app-text))]">{fileName}</span>
+        <span className="shrink-0 text-[13px] text-[hsl(var(--app-text-muted))]">{lineLabel}</span>
         {githubUrl ? (
           <a
             href={githubUrl}
             target="_blank"
             rel="noreferrer"
-            className="ml-auto inline-flex shrink-0 items-center gap-1 text-xs text-gray-500 hover:text-gray-800"
+            className="ml-auto inline-flex shrink-0 items-center gap-1 text-[13px] text-[hsl(var(--app-text-muted))] hover:text-[hsl(var(--app-text))]"
           >
             View on GitHub
-            <ExternalLink className="h-3 w-3" />
+            <ExternalLink className="h-3 w-3" strokeWidth={1.75} />
           </a>
         ) : null}
       </div>

@@ -3,15 +3,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--app-text))] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-blue-600 text-white hover:bg-blue-700",
+        default: "bg-[hsl(var(--app-text))] text-white hover:bg-[hsl(0_0%_20%)]",
         destructive: "bg-red-500 text-white hover:bg-red-600",
-        outline: "border border-gray-200 bg-white hover:bg-gray-100 hover:text-gray-900",
-        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-200",
-        ghost: "hover:bg-gray-100 hover:text-gray-900",
+        outline: "border border-[hsl(var(--border))] bg-white hover:bg-black/4 hover:text-[hsl(var(--app-text))]",
+        secondary: "bg-[hsl(var(--app-sidebar))] text-[hsl(var(--app-text))] hover:bg-black/[0.06]",
+        ghost: "hover:bg-black/4 hover:text-[hsl(var(--app-text))]",
         link: "text-blue-600 underline-offset-4 hover:underline",
       },
       size: {

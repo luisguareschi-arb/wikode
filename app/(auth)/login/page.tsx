@@ -5,14 +5,14 @@ import { Github, Chrome } from "lucide-react";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-[hsl(var(--app-sidebar))]">
+      <Card className="w-full max-w-md border-[hsl(var(--border))] shadow-sm">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-600">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(var(--app-text))]">
             <span className="text-xl font-bold text-white">W</span>
           </div>
-          <CardTitle className="text-2xl">Sign in to Wikode</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-2xl text-[hsl(var(--app-text))]">Sign in to Wikode</CardTitle>
+          <CardDescription className="text-[hsl(var(--app-text-muted))]">
             AI chat for your private codebases
           </CardDescription>
         </CardHeader>

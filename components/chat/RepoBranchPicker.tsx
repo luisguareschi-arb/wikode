@@ -72,10 +72,10 @@ export function RepoBranchPicker({
 
   if (loading) {
     return (
-      <div className={cn("flex items-center gap-1.5 text-gray-500", className)}>
+      <div className={cn("flex items-center gap-1.5 text-[hsl(var(--app-text-muted))]", className)}>
         <Loader2 className="h-3 w-3 animate-spin" />
         {variant === "header" ? (
-          <span className="text-xs">Loading…</span>
+          <span className="text-[13px]">Loading…</span>
         ) : (
           <span className="text-sm">Loading repositories...</span>
         )}
@@ -85,8 +85,16 @@ export function RepoBranchPicker({
 
   if (repos.length === 0) {
     return (
-      <p className={cn(variant === "header" ? "text-xs" : "text-sm", "text-gray-500", className)}>
-        {variant === "header" ? "No repository" : "No READY repositories found. Index a repository from Admin first."}
+      <p
+        className={cn(
+          variant === "header" ? "text-[13px]" : "text-sm",
+          "text-[hsl(var(--app-text-muted))]",
+          className
+        )}
+      >
+        {variant === "header"
+          ? "No repository"
+          : "No READY repositories found. Index a repository from Admin first."}
       </p>
     );
   }
@@ -100,7 +108,7 @@ export function RepoBranchPicker({
 
   if (variant === "header") {
     const repoContent = (
-      <span className="max-w-[180px] truncate text-xs sm:max-w-xs">{repoLabel}</span>
+      <span className="max-w-[180px] truncate font-mono text-[13px] sm:max-w-xs">{repoLabel}</span>
     );
 
     return (
@@ -111,13 +119,13 @@ export function RepoBranchPicker({
           <button
             type="button"
             onClick={() => setRepoOpen((open) => !open)}
-            className="text-xs text-gray-500 hover:text-gray-700"
+            className="text-[13px] text-[hsl(var(--app-text-muted))] hover:text-[hsl(var(--app-text))]"
           >
             {repoContent}
           </button>
         )}
         {repoOpen && (
-          <div className="absolute left-0 top-full z-20 mt-1 min-w-[220px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+          <div className="absolute left-0 top-full z-20 mt-1 min-w-[220px] rounded-lg border border-[hsl(var(--border))] bg-white py-1 shadow-lg">
             {repos.map((repo) => (
               <button
                 key={repo.id}
@@ -127,8 +135,8 @@ export function RepoBranchPicker({
                   setRepoOpen(false);
                 }}
                 className={cn(
-                  "block w-full px-3 py-2 text-left text-sm hover:bg-gray-50",
-                  repo.id === selectedRepoIds[0] && "bg-blue-50 text-blue-700"
+                  "block w-full px-3 py-2 text-left text-[13px] hover:bg-black/4",
+                  repo.id === selectedRepoIds[0] && "bg-[hsl(var(--app-active))] font-medium"
                 )}
               >
                 {repo.fullName}
@@ -152,15 +160,15 @@ export function RepoBranchPicker({
             setRepoOpen((open) => !open);
           }}
           className={cn(
-            "inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-gray-700",
-            !readOnly && "hover:bg-gray-100"
+            "inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-[hsl(var(--app-text))]",
+            !readOnly && "hover:bg-black/4"
           )}
         >
           {repoLabel}
-          {!readOnly && <ChevronDown className="h-3.5 w-3.5 text-gray-400" />}
+          {!readOnly && <ChevronDown className="h-3.5 w-3.5 text-[hsl(var(--app-text-muted))]" />}
         </button>
         {repoOpen && (
-          <div className="absolute left-0 top-full z-20 mt-1 min-w-[220px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+          <div className="absolute left-0 top-full z-20 mt-1 min-w-[220px] rounded-lg border border-[hsl(var(--border))] bg-white py-1 shadow-lg">
             {repos.map((repo) => (
               <button
                 key={repo.id}
@@ -170,8 +178,8 @@ export function RepoBranchPicker({
                   setRepoOpen(false);
                 }}
                 className={cn(
-                  "block w-full px-3 py-2 text-left text-sm hover:bg-gray-50",
-                  repo.id === selectedRepoIds[0] && "bg-blue-50 text-blue-700"
+                  "block w-full px-3 py-2 text-left text-[13px] hover:bg-black/4",
+                  repo.id === selectedRepoIds[0] && "bg-[hsl(var(--app-active))] font-medium"
                 )}
               >
                 {repo.fullName}
@@ -191,19 +199,19 @@ export function RepoBranchPicker({
             setBranchOpen((open) => !open);
           }}
           className={cn(
-            "inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-gray-700",
-            !readOnly && selectedRepo && "hover:bg-gray-100"
+            "inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-[hsl(var(--app-text))]",
+            !readOnly && selectedRepo && "hover:bg-black/4"
           )}
         >
           {selectedBranch}
-          {!readOnly && selectedRepo && <ChevronDown className="h-3.5 w-3.5 text-gray-400" />}
+          {!readOnly && selectedRepo && <ChevronDown className="h-3.5 w-3.5 text-[hsl(var(--app-text-muted))]" />}
         </button>
         {branchOpen && selectedRepo && (
-          <div className="absolute left-0 top-full z-20 mt-1 min-w-[140px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+          <div className="absolute left-0 top-full z-20 mt-1 min-w-[140px] rounded-lg border border-[hsl(var(--border))] bg-white py-1 shadow-lg">
             <button
               type="button"
               onClick={() => setBranchOpen(false)}
-              className="block w-full px-3 py-2 text-left text-sm bg-blue-50 text-blue-700"
+              className="block w-full px-3 py-2 text-left text-[13px] bg-[hsl(var(--app-active))] font-medium"
             >
               {selectedRepo.defaultBranch}
             </button>

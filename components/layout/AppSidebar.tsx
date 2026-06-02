@@ -3,9 +3,17 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Code2, Loader2, LogOut, MessageSquare, Settings, SquarePen, Trash2 } from "lucide-react";
+import {
+  Loader2,
+  LogOut,
+  MoreHorizontal,
+  PanelLeft,
+  Search,
+  Settings,
+  SquarePen,
+  Trash2,
+} from "lucide-react";
 import { signOut } from "next-auth/react";
-import { Button } from "@/components/ui/button";
 import { groupThreadsByDate, type ThreadListItem } from "@/lib/chat/group-threads";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +31,7 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
   const router = useRouter();
   const [threads, setThreads] = useState<ThreadListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const loadThreads = useCallback(async () => {
     try {
@@ -58,34 +67,44 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
   const isNewChat = pathname === "/chat";
 
   return (
-    <aside className="flex w-72 shrink-0 flex-col border-r border-gray-200 bg-white">
-      <div className="flex items-center gap-2 px-4 pb-2 pt-4">
-        <div className="flex h-7 w-7 items-center justify-center rounded bg-blue-600">
-          <Code2 className="h-4 w-4 text-white" />
-        </div>
-        <span className="font-semibold text-gray-900">Wikode</span>
+    <aside className="flex w-[260px] shrink-0 flex-col border-r border-[hsl(var(--border))] bg-[hsl(var(--app-sidebar))]">
+      <div className="flex items-center gap-1 px-3 pb-1 pt-3">
+        <button
+          type="button"
+          className="rounded-md p-1.5 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
+          aria-label="Search"
+        >
+          <Search className="h-4 w-4" strokeWidth={1.75} />
+        </button>
+        <Link
+          href="/chat"
+          className="rounded-md p-1.5 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
+          aria-label="New chat"
+        >
+          <SquarePen className="h-4 w-4" strokeWidth={1.75} />
+        </Link>
       </div>
 
       <nav className="space-y-0.5 px-2 pb-2">
         <Link
           href="/chat"
           className={cn(
-            "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100",
-            isNewChat && "bg-gray-100 font-medium text-gray-900"
+            "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] text-[hsl(var(--app-text))] transition-colors hover:bg-black/4",
+            isNewChat && "bg-[hsl(var(--app-active))] font-medium"
           )}
         >
-          <SquarePen className="h-4 w-4 shrink-0" />
+          <SquarePen className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]" strokeWidth={1.75} />
           New chat
         </Link>
         {isAdmin ? (
           <Link
             href="/admin"
             className={cn(
-              "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-700 hover:bg-gray-100",
-              pathname.startsWith("/admin") && "bg-gray-100 font-medium text-gray-900"
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] text-[hsl(var(--app-text))] transition-colors hover:bg-black/4",
+              pathname.startsWith("/admin") && "bg-[hsl(var(--app-active))] font-medium"
             )}
           >
-            <Settings className="h-4 w-4 shrink-0" />
+            <Settings className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]" strokeWidth={1.75} />
             Admin
           </Link>
         ) : null}
@@ -93,17 +112,19 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
 
       <div className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
         {loading ? (
-          <div className="flex items-center gap-2 px-3 py-4 text-sm text-gray-500">
-            <Loader2 className="h-4 w-4 animate-spin" />
+          <div className="flex items-center gap-2 px-2.5 py-4 text-[13px] text-[hsl(var(--app-text-muted))]">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
             Loading…
           </div>
         ) : threadGroups.length === 0 ? (
-          <p className="px-3 py-4 text-xs text-gray-500">No conversations yet.</p>
+          <p className="px-2.5 py-4 text-xs text-[hsl(var(--app-text-muted))]">No conversations yet.</p>
         ) : (
           <div className="space-y-3">
             {threadGroups.map((group) => (
               <div key={group.label}>
-                <p className="px-3 py-1 text-xs font-medium text-gray-500">{group.label}</p>
+                <p className="px-2.5 py-1 text-[11px] font-medium uppercase tracking-wide text-[hsl(var(--app-text-muted))]">
+                  {group.label}
+                </p>
                 <ul className="space-y-0.5">
                   {group.threads.map((thread) => {
                     const isActive = pathname === `/chat/${thread.id}`;
@@ -112,21 +133,20 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
                         <Link
                           href={`/chat/${thread.id}`}
                           className={cn(
-                            "group flex items-center gap-2 rounded-md px-3 py-2 text-sm text-gray-800 hover:bg-gray-100",
-                            isActive && "bg-gray-100 font-medium text-gray-900"
+                            "group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] text-[hsl(var(--app-text))] transition-colors hover:bg-black/4",
+                            isActive && "bg-[hsl(var(--app-active))] font-medium"
                           )}
                         >
-                          <MessageSquare className="h-3.5 w-3.5 shrink-0 text-gray-400" />
                           <span className="min-w-0 flex-1 truncate">
                             {thread.title?.trim() || "Untitled"}
                           </span>
                           <button
                             type="button"
-                            className="shrink-0 rounded p-0.5 text-gray-400 opacity-0 hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
+                            className="shrink-0 rounded p-0.5 text-[hsl(var(--app-text-muted))] opacity-0 transition-opacity hover:text-red-600 group-hover:opacity-100"
                             aria-label="Delete conversation"
                             onClick={(event) => void deleteThread(thread.id, event)}
                           >
-                            <Trash2 className="h-3.5 w-3.5" />
+                            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
                           </button>
                         </Link>
                       </li>
@@ -139,27 +159,63 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
         )}
       </div>
 
-      <div className="border-t border-gray-200 p-3">
-        <div className="mb-2 flex items-center gap-2 px-1">
+      <div className="border-t border-[hsl(var(--border))] p-2">
+        <div className="flex items-center gap-2 rounded-lg px-2 py-1.5">
           {user.image ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={user.image} alt={user.name ?? "User"} className="h-7 w-7 rounded-full" />
-          ) : null}
-          <div className="min-w-0">
-            <p className="truncate text-xs font-medium text-gray-900">{user.name}</p>
-            <p className="truncate text-xs text-gray-500">{user.email}</p>
+            <img
+              src={user.image}
+              alt={user.name ?? "User"}
+              className="h-7 w-7 shrink-0 rounded-full"
+            />
+          ) : (
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--app-code-bg))] text-xs font-medium text-[hsl(var(--app-text))]">
+              {(user.name ?? user.email ?? "U").charAt(0).toUpperCase()}
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-medium text-[hsl(var(--app-text))]">
+              {user.name ?? "User"}
+            </p>
           </div>
+          <div className="relative">
+            <button
+              type="button"
+              className="rounded-md p-1 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
+              aria-label="Account menu"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <MoreHorizontal className="h-4 w-4" strokeWidth={1.75} />
+            </button>
+            {menuOpen ? (
+              <>
+                <button
+                  type="button"
+                  className="fixed inset-0 z-10"
+                  aria-label="Close menu"
+                  onClick={() => setMenuOpen(false)}
+                />
+                <div className="absolute bottom-full right-0 z-20 mb-1 min-w-[140px] rounded-lg border border-[hsl(var(--border))] bg-white py-1 shadow-lg">
+                  <button
+                    type="button"
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-[hsl(var(--app-text))] hover:bg-black/4"
+                    onClick={() => void signOut({ callbackUrl: "/login" })}
+                  >
+                    <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} />
+                    Sign out
+                  </button>
+                </div>
+              </>
+            ) : null}
+          </div>
+          <button
+            type="button"
+            className="rounded-md p-1 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
+            aria-label="Collapse sidebar"
+          >
+            <PanelLeft className="h-4 w-4" strokeWidth={1.75} />
+          </button>
         </div>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start gap-2 text-gray-600"
-          onClick={() => void signOut({ callbackUrl: "/login" })}
-        >
-          <LogOut className="h-4 w-4" />
-          Sign out
-        </Button>
       </div>
     </aside>
   );
