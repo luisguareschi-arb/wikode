@@ -72,17 +72,21 @@ export function RepoBranchPicker({
 
   if (loading) {
     return (
-      <div className={cn("flex items-center gap-2 text-sm text-gray-500", className)}>
-        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-        Loading repositories...
+      <div className={cn("flex items-center gap-1.5 text-gray-500", className)}>
+        <Loader2 className="h-3 w-3 animate-spin" />
+        {variant === "header" ? (
+          <span className="text-xs">Loading…</span>
+        ) : (
+          <span className="text-sm">Loading repositories...</span>
+        )}
       </div>
     );
   }
 
   if (repos.length === 0) {
     return (
-      <p className={cn("text-sm text-gray-500", className)}>
-        No READY repositories found. Index a repository from Admin first.
+      <p className={cn(variant === "header" ? "text-xs" : "text-sm", "text-gray-500", className)}>
+        {variant === "header" ? "No repository" : "No READY repositories found. Index a repository from Admin first."}
       </p>
     );
   }
@@ -95,24 +99,25 @@ export function RepoBranchPicker({
         : "Select repository";
 
   if (variant === "header") {
+    const repoContent = (
+      <span className="max-w-[180px] truncate text-xs sm:max-w-xs">{repoLabel}</span>
+    );
+
     return (
       <div ref={containerRef} className={cn("relative", className)}>
-        <button
-          type="button"
-          disabled={readOnly}
-          onClick={() => {
-            if (readOnly) return;
-            setRepoOpen((open) => !open);
-          }}
-          className={cn(
-            "max-w-[200px] truncate text-xs font-medium text-gray-700 sm:max-w-xs",
-            !readOnly && "hover:text-gray-900"
-          )}
-        >
-          {repoLabel}
-        </button>
+        {readOnly ? (
+          repoContent
+        ) : (
+          <button
+            type="button"
+            onClick={() => setRepoOpen((open) => !open)}
+            className="text-xs text-gray-500 hover:text-gray-700"
+          >
+            {repoContent}
+          </button>
+        )}
         {repoOpen && (
-          <div className="absolute right-0 top-full z-20 mt-1 min-w-[220px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+          <div className="absolute left-0 top-full z-20 mt-1 min-w-[220px] rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
             {repos.map((repo) => (
               <button
                 key={repo.id}

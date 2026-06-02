@@ -138,8 +138,8 @@ export function MessageBubble({ message }: { message: ChatMessageItem }) {
 
   if (isUser) {
     return (
-      <div className="w-full sticky top-2">
-        <div className="inline-block max-w-full rounded-2xl bg-gray-100 px-4 py-3 w-full">
+      <div className="w-full sticky top-0">
+        <div className="inline-block max-w-full rounded-2xl bg-gray-100 px-4 py-3 w-full shadow-md border border-gray-200">
           <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-gray-900">
             {effectiveContent}
           </p>
@@ -149,7 +149,7 @@ export function MessageBubble({ message }: { message: ChatMessageItem }) {
   }
 
   return (
-    <div className="w-full py-1">
+    <div className="w-full py-1 px-3">
       <div className={cn("prose-sm max-w-none", !effectiveContent && "text-gray-400")}>
         <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
           {effectiveContent}
