@@ -25,8 +25,8 @@
   --radius: 0.5rem;
 
   /* Cursor-like app shell */
-  --app-sidebar: 0 0% 97%;
-  --app-surface: 0 0% 100%;
+  --app-sidebar: 0 0% 95%;
+  --app-surface: 0 0% 97%;
   --app-text: 0 0% 10%;
   --app-text-muted: 0 0% 44%;
   --app-active: 0 0% 91%;
