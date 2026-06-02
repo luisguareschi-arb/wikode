@@ -1,28 +1,157 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ArrowUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ChatHeader } from "@/components/chat/ChatHeader";
 import { MessageBubble, type ChatMessageItem } from "@/components/chat/MessageBubble";
+import { RepoBranchPicker } from "@/components/chat/RepoBranchPicker";
+import { cn } from "@/lib/utils";
 
 interface ChatWindowProps {
   initialMessages?: ChatMessageItem[];
   threadId?: string;
+  threadTitle?: string | null;
   repoIds: string[];
+  onRepoIdsChange?: (repoIds: string[]) => void;
   placeholder?: string;
 }
 
-export function ChatWindow({ initialMessages = [], threadId, repoIds, placeholder }: ChatWindowProps) {
+function ChatComposer({
+  value,
+  onChange,
+  onSend,
+  sending,
+  disabled,
+  placeholder,
+  error,
+  helperText,
+  repoIds,
+  onRepoIdsChange,
+  mode,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  onSend: () => void;
+  sending: boolean;
+  disabled: boolean;
+  placeholder?: string;
+  error: string | null;
+  helperText: string | null;
+  repoIds: string[];
+  onRepoIdsChange?: (repoIds: string[]) => void;
+  mode: "empty" | "follow-up";
+}) {
+  const isEmpty = mode === "empty";
+
+  return (
+    <div className={cn("w-full", isEmpty ? "max-w-2xl" : "max-w-3xl mx-auto")}>
+      {isEmpty && (
+        <RepoBranchPicker
+          selectedRepoIds={repoIds}
+          onChange={onRepoIdsChange}
+          className="mb-2 px-1"
+        />
+      )}
+      <div
+        className={cn(
+          "rounded-2xl border border-gray-200 bg-white shadow-sm",
+          "focus-within:border-gray-300 focus-within:ring-1 focus-within:ring-gray-200",
+          !isEmpty && "relative"
+        )}
+      >
+        <textarea
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" && !event.shiftKey) {
+              event.preventDefault();
+              void onSend();
+            }
+          }}
+          placeholder={placeholder}
+          rows={isEmpty ? 4 : 2}
+          className={cn(
+            "w-full resize-none rounded-2xl bg-transparent px-4 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none",
+            isEmpty ? "min-h-[100px] pb-2 pt-4" : "min-h-[72px] py-3 pr-12 pb-10"
+          )}
+        />
+        {isEmpty ? (
+          <div className="flex items-center justify-between gap-2 px-3 pb-3">
+            <p className={cn("min-w-0 flex-1 truncate text-xs", error ? "text-red-600" : "text-gray-500")}>
+              {error ?? helperText}
+            </p>
+            <Button
+              size="icon"
+              className="h-8 w-8 shrink-0 rounded-full"
+              onClick={() => void onSend()}
+              disabled={disabled}
+              aria-label={sending ? "Sending" : "Send message"}
+            >
+              {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+            </Button>
+          </div>
+        ) : (
+          <Button
+            size="icon"
+            className="absolute bottom-3 right-3 h-8 w-8 rounded-full"
+            onClick={() => void onSend()}
+            disabled={disabled}
+            aria-label={sending ? "Sending" : "Send message"}
+          >
+            {sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <ArrowUp className="h-4 w-4" />}
+          </Button>
+        )}
+      </div>
+      {!isEmpty && (error || helperText) && (
+        <p className={cn("mt-1.5 text-center text-xs", error ? "text-red-600" : "text-gray-500")}>
+          {error ?? helperText}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export function ChatWindow({
+  initialMessages = [],
+  threadId,
+  threadTitle: initialThreadTitle,
+  repoIds,
+  onRepoIdsChange,
+  placeholder,
+}: ChatWindowProps) {
+  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessageItem[]>(initialMessages);
   const [value, setValue] = useState("");
   const [sending, setSending] = useState(false);
   const [activeThreadId, setActiveThreadId] = useState<string | undefined>(threadId);
+  const [threadTitle, setThreadTitle] = useState(initialThreadTitle?.trim() ?? "");
   const [error, setError] = useState<string | null>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isEmpty = messages.length === 0;
   const disabled = sending || repoIds.length === 0 || !value.trim();
 
+  const displayTitle = useMemo(() => {
+    if (threadTitle) return threadTitle;
+    const firstUser = messages.find((m) => m.role === "user");
+    if (firstUser?.content) return firstUser.content.slice(0, 80);
+    return "New conversation";
+  }, [threadTitle, messages]);
+
   const helperText = useMemo(() => {
-    if (repoIds.length === 0) return "Select at least one READY repository.";
+    if (repoIds.length === 0) return "Select a repository to start.";
     return null;
   }, [repoIds]);
+
+  const composerPlaceholder = isEmpty
+    ? (placeholder ?? "Ask Wikode to explore, explain, or find code in your repository...")
+    : "Add a follow-up";
+
+  useEffect(() => {
+    if (!scrollRef.current || isEmpty) return;
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, isEmpty, sending]);
 
   const sendMessage = async () => {
     const userMessage = value.trim();
@@ -30,6 +159,10 @@ export function ChatWindow({ initialMessages = [], threadId, repoIds, placeholde
     setSending(true);
     setValue("");
     setError(null);
+
+    if (!threadTitle) {
+      setThreadTitle(userMessage.slice(0, 80));
+    }
 
     const userEntry: ChatMessageItem = {
       id: `user-${Date.now()}`,
@@ -62,6 +195,7 @@ export function ChatWindow({ initialMessages = [], threadId, repoIds, placeholde
       }
       setActiveThreadId(resolvedThreadId);
       window.dispatchEvent(new CustomEvent("wikode:threads-changed"));
+      router.replace(`/chat/${resolvedThreadId}`);
     }
 
     const response = await fetch("/api/chat", {
@@ -107,42 +241,46 @@ export function ChatWindow({ initialMessages = [], threadId, repoIds, placeholde
     setSending(false);
   };
 
-  return (
-    <div className="flex h-full flex-col">
-      <div className="flex-1 overflow-y-auto p-4">
-        {messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-center">
-            <p className="max-w-md text-sm text-gray-500">
-              Ask a question about your selected repositories. Responses include file and line citations.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {messages.map((message) => (
-              <MessageBubble key={message.id} message={message} />
-            ))}
-          </div>
-        )}
+  const composer = (
+    <ChatComposer
+      value={value}
+      onChange={setValue}
+      onSend={sendMessage}
+      sending={sending}
+      disabled={disabled}
+      placeholder={composerPlaceholder}
+      error={error}
+      helperText={helperText}
+      repoIds={repoIds}
+      onRepoIdsChange={onRepoIdsChange}
+      mode={isEmpty ? "empty" : "follow-up"}
+    />
+  );
+
+  if (isEmpty) {
+    return (
+      <div className="flex h-full flex-1 flex-col items-center justify-center bg-white px-4 py-8">
+        {composer}
       </div>
-      <div className="border-t p-4">
-        <textarea
-          value={value}
-          onChange={(event) => setValue(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              void sendMessage();
-            }
-          }}
-          placeholder={placeholder ?? "Ask about your codebase..."}
-          className="min-h-24 w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <div className="mt-2 flex items-center justify-between">
-          <p className={`text-xs ${error ? "text-red-600" : "text-gray-500"}`}>{error ?? helperText}</p>
-          <Button onClick={() => void sendMessage()} disabled={disabled}>
-            {sending ? "Sending..." : "Send"}
-          </Button>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-1 flex-col bg-white">
+      <ChatHeader
+        title={displayTitle}
+        repoIds={repoIds}
+        onRepoIdsChange={activeThreadId ? undefined : onRepoIdsChange}
+      />
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
+        <div className="mx-auto max-w-3xl space-y-6 px-4 py-6">
+          {messages.map((message) => (
+            <MessageBubble key={message.id} message={message} />
+          ))}
         </div>
+      </div>
+      <div className="shrink-0 bg-linear-to-t from-white via-white to-transparent px-4 pb-4 pt-2">
+        {composer}
       </div>
     </div>
   );

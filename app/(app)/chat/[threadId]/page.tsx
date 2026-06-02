@@ -51,10 +51,11 @@ export default async function ThreadPage({
   }
 
   return (
-    <div className="h-full min-h-screen bg-white">
+    <div className="flex h-full flex-1 flex-col bg-white">
       <ChatWindow
         key={thread.id}
         threadId={thread.id}
+        threadTitle={thread.title}
         repoIds={thread.repos.map((item) => item.repositoryId)}
         initialMessages={thread.messages.map((message) => ({
           id: message.id,

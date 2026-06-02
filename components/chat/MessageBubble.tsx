@@ -4,6 +4,7 @@ import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Highlight, type Language, themes } from "prism-react-renderer";
 import { CitationCard, type CitationData } from "@/components/chat/CitationCard";
+import { cn } from "@/lib/utils";
 
 export interface ChatMessageItem {
   id: string;
@@ -40,27 +41,17 @@ const markdownComponents: Components = {
     <h4 className="mb-1 text-[13px] font-semibold text-gray-900">{children}</h4>
   ),
   p: ({ children }) => (
-    <p className="mb-1 text-[13px] leading-relaxed text-gray-900 last:mb-0">
-      {children}
-    </p>
+    <p className="mb-2 text-[13px] leading-relaxed text-gray-800 last:mb-0">{children}</p>
   ),
   ul: ({ children }) => (
-    <ul className="mb-1 list-disc space-y-1 pl-5 text-[13px] text-gray-900">
-      {children}
-    </ul>
+    <ul className="mb-2 list-disc space-y-1.5 pl-5 text-[13px] text-gray-800">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="mb-1 list-decimal space-y-1 pl-5 text-[13px] text-gray-900">
-      {children}
-    </ol>
+    <ol className="mb-2 list-decimal space-y-1.5 pl-5 text-[13px] text-gray-800">{children}</ol>
   ),
-  li: ({ children }) => (
-    <li className="leading-relaxed">{children}</li>
-  ),
-  strong: ({ children }) => (
-    <strong className="font-semibold text-gray-900">{children}</strong>
-  ),
-  em: ({ children }) => <em className="text-gray-900">{children}</em>,
+  li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+  strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+  em: ({ children }) => <em className="text-gray-800">{children}</em>,
   a: ({ children, href }) => (
     <a
       href={href}
@@ -74,7 +65,7 @@ const markdownComponents: Components = {
   code: ({ inline, className, children }) => {
     if (inline) {
       return (
-        <code className="rounded bg-gray-100 px-1 py-0.5 text-[12px] font-mono text-gray-900">
+        <code className="rounded bg-gray-200/80 px-1.5 py-0.5 font-mono text-[12px] text-gray-900">
           {children}
         </code>
       );
@@ -83,21 +74,18 @@ const markdownComponents: Components = {
     const match = /language-(\w+)/.exec(className ?? "");
     const code = String(children ?? "").replace(/\n$/, "");
 
-    // Heuristic: short, single-line blocks (often produced by fenced code with one word)
-    // should look like inline pills instead of full-width blocks.
     if (!match) {
       const isSingleShortLine = !code.includes("\n") && code.length <= 40;
       if (isSingleShortLine) {
         return (
-          <code className="inline-block rounded bg-gray-100 px-1.5 py-0.5 text-[12px] font-mono text-gray-900">
+          <code className="inline-block rounded bg-gray-200/80 px-1.5 py-0.5 font-mono text-[12px] text-gray-900">
             {code}
           </code>
         );
       }
 
-      // No language and multi-line: simple block code with a soft light background
       return (
-        <code className="block mt-2 overflow-x-auto rounded-md bg-gray-100 px-3 py-2 text-[12px] leading-relaxed text-gray-900 font-mono">
+        <code className="mt-2 block overflow-x-auto rounded-md bg-gray-100 px-3 py-2 font-mono text-[12px] leading-relaxed text-gray-900">
           {code}
         </code>
       );
@@ -105,27 +93,21 @@ const markdownComponents: Components = {
 
     const language = match[1] as Language;
 
-    // Block code with syntax highlighting and light background
     return (
-      <code className="block mt-2 overflow-hidden rounded-md border border-gray-200 bg-[#f6f8fa] text-[12px] leading-relaxed text-gray-900 font-mono">
+      <code className="mt-2 block overflow-hidden rounded-md border border-gray-200 bg-[#f6f8fa] font-mono text-[12px] leading-relaxed text-gray-900">
         <Highlight theme={themes.github} code={code} language={language}>
           {({ tokens, getLineProps, getTokenProps }) => (
             <div className="px-3 py-2">
               {tokens.map((line, i) => {
                 const lineProps = getLineProps({ line, key: i });
-                const { key, className: lpClassName, ...restLineProps } = lineProps as {
-                  key?: React.Key;
+                const { className: lpClassName, ...restLineProps } = lineProps as {
                   className?: string;
                 };
-                const className = `${lpClassName ?? ""} whitespace-pre`;
-
                 return (
-                  <div key={i} {...restLineProps} className={className}>
+                  <div key={i} {...restLineProps} className={`${lpClassName ?? ""} whitespace-pre`}>
                     {line.map((token, tokenIndex) => {
                       const tokenProps = getTokenProps({ token, key: tokenIndex });
-                      const { key: tokenKey, ...restTokenProps } = tokenProps as {
-                        key?: React.Key;
-                      };
+                      const { key: tokenKey, ...restTokenProps } = tokenProps as { key?: React.Key };
                       return <span key={tokenIndex} {...restTokenProps} />;
                     })}
                   </div>
@@ -138,58 +120,51 @@ const markdownComponents: Components = {
     );
   },
   blockquote: ({ children }) => (
-    <blockquote className="border-l-2 border-gray-200 pl-3 text-[13px] italic text-gray-800">
+    <blockquote className="border-l-2 border-gray-200 pl-3 text-[13px] italic text-gray-700">
       {children}
     </blockquote>
   ),
-  hr: () => <hr className="my-2 border-gray-200" />,
+  hr: () => <hr className="my-3 border-gray-200" />,
 };
 
 export function MessageBubble({ message }: { message: ChatMessageItem }) {
   const parsedCitations = parseInlineCitations(message.content);
   const citations =
-    message.citations && message.citations.length > 0
-      ? message.citations
-      : parsedCitations;
+    message.citations && message.citations.length > 0 ? message.citations : parsedCitations;
   const isUser = message.role === "user";
 
   const displayContent = (message.content || "").replace(citationPattern, "").trim();
   const effectiveContent = displayContent || (!isUser ? "Thinking…" : "");
 
-  return (
-    <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
-      <div
-        className={`max-w-3xl rounded-2xl px-4 py-3 text-sm leading-6 shadow-sm ${
-          isUser
-            ? "bg-blue-600 text-white"
-            : "bg-gray-50 text-gray-900 border border-gray-200"
-        }`}
-      >
-        {isUser ? (
-          <p className="whitespace-pre-wrap text-[13px] leading-relaxed">
+  if (isUser) {
+    return (
+      <div className="w-full sticky top-2">
+        <div className="inline-block max-w-full rounded-2xl bg-gray-100 px-4 py-3 w-full">
+          <p className="whitespace-pre-wrap text-[13px] leading-relaxed text-gray-900">
             {effectiveContent}
           </p>
-        ) : (
-          <div className="space-y-1">
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              components={markdownComponents}
-            >
-              {effectiveContent}
-            </ReactMarkdown>
-          </div>
-        )}
-        {!isUser && citations.length > 0 ? (
-          <div className="mt-3 space-y-2">
-            {citations.map((citation, index) => (
-              <CitationCard
-                key={`${citation.filePath}-${citation.startLine}-${citation.endLine}-${index}`}
-                citation={citation}
-              />
-            ))}
-          </div>
-        ) : null}
+        </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="w-full py-1">
+      <div className={cn("prose-sm max-w-none", !effectiveContent && "text-gray-400")}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+          {effectiveContent}
+        </ReactMarkdown>
+      </div>
+      {citations.length > 0 ? (
+        <div className="mt-4 space-y-2">
+          {citations.map((citation, index) => (
+            <CitationCard
+              key={`${citation.filePath}-${citation.startLine}-${citation.endLine}-${index}`}
+              citation={citation}
+            />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
