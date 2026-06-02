@@ -1,6 +1,6 @@
 "use client";
 
-import { Folder, MoreHorizontal, PanelLeft } from "lucide-react";
+import { Folder, MoreHorizontal } from "lucide-react";
 import { RepoBranchPicker } from "@/components/chat/RepoBranchPicker";
 import { cn } from "@/lib/utils";
 
@@ -37,13 +37,6 @@ export function ChatHeader({ title, repoIds, onRepoIdsChange, className }: ChatH
           aria-label="More options"
         >
           <MoreHorizontal className="h-4 w-4" strokeWidth={1.75} />
-        </button>
-        <button
-          type="button"
-          className="rounded-md p-1.5 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
-          aria-label="Toggle sidebar"
-        >
-          <PanelLeft className="h-4 w-4" strokeWidth={1.75} />
         </button>
       </div>
     </header>

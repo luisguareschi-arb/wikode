@@ -6,9 +6,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   Loader2,
   LogOut,
+  MessageSquare,
   MoreHorizontal,
-  PanelLeft,
-  Search,
   Settings,
   SquarePen,
   Trash2,
@@ -68,21 +67,8 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
 
   return (
     <aside className="flex w-[260px] shrink-0 flex-col border-r border-[hsl(var(--border))] bg-[hsl(var(--app-sidebar))]">
-      <div className="flex items-center gap-1 px-3 pb-1 pt-3">
-        <button
-          type="button"
-          className="rounded-md p-1.5 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
-          aria-label="Search"
-        >
-          <Search className="h-4 w-4" strokeWidth={1.75} />
-        </button>
-        <Link
-          href="/chat"
-          className="rounded-md p-1.5 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
-          aria-label="New chat"
-        >
-          <SquarePen className="h-4 w-4" strokeWidth={1.75} />
-        </Link>
+      <div className="px-3 pb-4 pt-3">
+        <span className="text-sm font-semibold text-[hsl(var(--app-text))]">Wikode</span>
       </div>
 
       <nav className="space-y-0.5 px-2 pb-2">
@@ -137,6 +123,7 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
                             isActive && "bg-[hsl(var(--app-active))] font-medium"
                           )}
                         >
+                          <MessageSquare className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--app-text-muted))]" strokeWidth={1.75} />
                           <span className="min-w-0 flex-1 truncate">
                             {thread.title?.trim() || "Untitled"}
                           </span>
@@ -208,13 +195,6 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
               </>
             ) : null}
           </div>
-          <button
-            type="button"
-            className="rounded-md p-1 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
-            aria-label="Collapse sidebar"
-          >
-            <PanelLeft className="h-4 w-4" strokeWidth={1.75} />
-          </button>
         </div>
       </div>
     </aside>
