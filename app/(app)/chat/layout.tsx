@@ -1,5 +1,3 @@
-import { ChatLayoutShell } from "@/components/chat/ChatLayoutShell";
-
 export default function ChatLayout({ children }: { children: React.ReactNode }) {
-  return <ChatLayoutShell>{children}</ChatLayoutShell>;
+  return <div className="flex h-full min-h-0 flex-1 flex-col">{children}</div>;
 }
