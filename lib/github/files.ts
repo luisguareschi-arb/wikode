@@ -55,7 +55,7 @@ export async function getRepoFileTree(
   repo: string,
   treeSha: string
 ): Promise<FileEntry[]> {
-  const { data } = await octokit.git.getTree({
+  const { data } = await octokit.rest.git.getTree({
     owner,
     repo,
     tree_sha: treeSha,
@@ -92,7 +92,7 @@ export async function getFileBlob(
   filePath: string,
   ref: string
 ): Promise<{ content: string; sha: string }> {
-  const { data } = await octokit.repos.getContent({
+  const { data } = await octokit.rest.repos.getContent({
     owner,
     repo,
     path: filePath,

@@ -22,8 +22,21 @@ function ReposContent() {
   const [repos, setRepos] = useState<Repo[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
+  const [cookieInstallationId, setCookieInstallationId] = useState<string | null>(null);
   const searchParams = useSearchParams();
-  const installationId = searchParams.get("installation_id");
+  const installationIdFromUrl = searchParams.get("installation_id");
+  const installationId = installationIdFromUrl ?? cookieInstallationId;
+
+  // Callback stores gh_installation_id in an httpOnly cookie; read it when URL has no param
+  useEffect(() => {
+    if (installationIdFromUrl) return;
+    fetch("/api/github/installation")
+      .then((r) => r.json())
+      .then((d: { installationId?: string }) => {
+        if (d.installationId) setCookieInstallationId(d.installationId);
+      })
+      .catch(() => {});
+  }, [installationIdFromUrl]);
 
   const loadRepos = useCallback(async () => {
     const res = await fetch("/api/repos");

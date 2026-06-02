@@ -26,7 +26,13 @@ export function ThreadSidebar() {
   }, []);
 
   useEffect(() => {
-    loadThreads();
+    void loadThreads();
+  }, [loadThreads, pathname]);
+
+  useEffect(() => {
+    const onThreadsChanged = () => void loadThreads();
+    window.addEventListener("wikode:threads-changed", onThreadsChanged);
+    return () => window.removeEventListener("wikode:threads-changed", onThreadsChanged);
   }, [loadThreads]);
 
   const deleteThread = async (threadId: string) => {

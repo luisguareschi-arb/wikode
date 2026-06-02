@@ -33,7 +33,9 @@ export function MessageBubble({ message }: { message: ChatMessageItem }) {
   return (
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       <div className={`max-w-3xl rounded-lg px-4 py-3 ${isUser ? "bg-blue-600 text-white" : "bg-white border text-gray-900"}`}>
-        <p className="whitespace-pre-wrap text-sm leading-6">{message.content}</p>
+        <p className="whitespace-pre-wrap text-sm leading-6">
+          {message.content || (!isUser ? "Thinking…" : "")}
+        </p>
         {!isUser && citations.length > 0 ? (
           <div className="mt-2 space-y-2">
             {citations.map((citation, index) => (

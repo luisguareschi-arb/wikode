@@ -53,6 +53,7 @@ export default async function ThreadPage({
   return (
     <div className="h-full min-h-screen bg-white">
       <ChatWindow
+        key={thread.id}
         threadId={thread.id}
         repoIds={thread.repos.map((item) => item.repositoryId)}
         initialMessages={thread.messages.map((message) => ({

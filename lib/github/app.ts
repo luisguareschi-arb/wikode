@@ -9,6 +9,7 @@ function getApp(): App {
     _app = new App({
       appId: process.env.GITHUB_APP_ID!,
       privateKey,
+      Octokit,
       webhooks: { secret: process.env.GITHUB_APP_WEBHOOK_SECRET! },
       oauth: {
         clientId: process.env.GITHUB_APP_CLIENT_ID!,
@@ -25,8 +26,7 @@ function getApp(): App {
  */
 export async function getInstallationOctokit(installationId: number): Promise<Octokit> {
   const app = getApp();
-  const octokit = await app.getInstallationOctokit(installationId);
-  return octokit as unknown as Octokit;
+  return app.getInstallationOctokit(installationId) as Promise<Octokit>;
 }
 
 export function getGitHubApp(): App {

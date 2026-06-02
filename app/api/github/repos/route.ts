@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
   const octokit = await getInstallationOctokit(parseInt(installationId, 10));
 
-  const { data } = await octokit.apps.listReposAccessibleToInstallation({
+  const { data } = await octokit.rest.apps.listReposAccessibleToInstallation({
     per_page: 100,
   });
 

@@ -58,29 +58,24 @@ export async function POST(req: NextRequest) {
     content: m.content,
   }));
 
-  const stream = streamChat(message, history, chunks);
-  stream.consumeStream();
-  stream.text.then(async (fullResponse) => {
-    try {
-      const citations = citationsWithContext(
-        fullResponse,
-        chunks,
-        thread.repos.map((threadRepo) => ({
-          fullName: threadRepo.repository.fullName,
-          defaultBranch: threadRepo.repository.defaultBranch,
-        }))
-      );
-      await prisma.message.create({
-        data: {
-          threadId,
-          role: "assistant",
-          content: fullResponse,
-          citations: citations.length > 0 ? (citations as unknown as Prisma.InputJsonValue) : undefined,
-        },
-      });
-    } catch (error) {
-      console.error("[chat] failed to persist assistant message", error);
-    }
+  const stream = streamChat(message, history, chunks, async (fullResponse) => {
+    if (!fullResponse) return;
+    const citations = citationsWithContext(
+      fullResponse,
+      chunks,
+      thread.repos.map((threadRepo) => ({
+        fullName: threadRepo.repository.fullName,
+        defaultBranch: threadRepo.repository.defaultBranch,
+      }))
+    );
+    await prisma.message.create({
+      data: {
+        threadId,
+        role: "assistant",
+        content: fullResponse,
+        citations: citations.length > 0 ? (citations as unknown as Prisma.InputJsonValue) : undefined,
+      },
+    });
   });
 
   return stream.toTextStreamResponse({

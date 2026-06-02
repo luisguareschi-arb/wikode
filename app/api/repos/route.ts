@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
   // Get the current HEAD sha
   const octokit = await getInstallationOctokit(installationId);
-  const { data: ref } = await octokit.git.getRef({
+  const { data: ref } = await octokit.rest.git.getRef({
     owner,
     repo: name,
     ref: `heads/${defaultBranch}`,

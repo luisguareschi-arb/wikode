@@ -19,7 +19,7 @@ export async function POST(
   if (!repo) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const octokit = await getInstallationOctokit(repo.installationId);
-  const { data: ref } = await octokit.git.getRef({
+  const { data: ref } = await octokit.rest.git.getRef({
     owner: repo.owner,
     repo: repo.name,
     ref: `heads/${repo.defaultBranch}`,

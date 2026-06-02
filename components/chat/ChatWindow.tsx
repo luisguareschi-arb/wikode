@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { MessageBubble, type ChatMessageItem } from "@/components/chat/MessageBubble";
 
@@ -13,11 +12,11 @@ interface ChatWindowProps {
 }
 
 export function ChatWindow({ initialMessages = [], threadId, repoIds, placeholder }: ChatWindowProps) {
-  const router = useRouter();
   const [messages, setMessages] = useState<ChatMessageItem[]>(initialMessages);
   const [value, setValue] = useState("");
   const [sending, setSending] = useState(false);
   const [activeThreadId, setActiveThreadId] = useState<string | undefined>(threadId);
+  const [error, setError] = useState<string | null>(null);
   const disabled = sending || repoIds.length === 0 || !value.trim();
 
   const helperText = useMemo(() => {
@@ -30,6 +29,7 @@ export function ChatWindow({ initialMessages = [], threadId, repoIds, placeholde
     if (!userMessage || sending || repoIds.length === 0) return;
     setSending(true);
     setValue("");
+    setError(null);
 
     const userEntry: ChatMessageItem = {
       id: `user-${Date.now()}`,
@@ -48,14 +48,20 @@ export function ChatWindow({ initialMessages = [], threadId, repoIds, placeholde
           repoIds,
         }),
       });
-      const threadData = (await threadRes.json()) as { thread?: { id: string } };
+      const threadData = (await threadRes.json()) as { thread?: { id: string }; error?: string };
+      if (!threadRes.ok) {
+        setError(threadData.error ?? "Failed to create conversation.");
+        setSending(false);
+        return;
+      }
       resolvedThreadId = threadData.thread?.id;
       if (!resolvedThreadId) {
+        setError("Failed to create conversation.");
         setSending(false);
         return;
       }
       setActiveThreadId(resolvedThreadId);
-      router.push(`/chat/${resolvedThreadId}`);
+      window.dispatchEvent(new CustomEvent("wikode:threads-changed"));
     }
 
     const response = await fetch("/api/chat", {
@@ -68,7 +74,15 @@ export function ChatWindow({ initialMessages = [], threadId, repoIds, placeholde
       }),
     });
 
+    if (!response.ok) {
+      const errBody = (await response.json().catch(() => null)) as { error?: string } | null;
+      setError(errBody?.error ?? `Chat failed (${response.status}).`);
+      setSending(false);
+      return;
+    }
+
     if (!response.body) {
+      setError("No response from chat service.");
       setSending(false);
       return;
     }
@@ -124,7 +138,7 @@ export function ChatWindow({ initialMessages = [], threadId, repoIds, placeholde
           className="min-h-24 w-full resize-none rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <div className="mt-2 flex items-center justify-between">
-          <p className="text-xs text-gray-500">{helperText}</p>
+          <p className={`text-xs ${error ? "text-red-600" : "text-gray-500"}`}>{error ?? helperText}</p>
           <Button onClick={() => void sendMessage()} disabled={disabled}>
             {sending ? "Sending..." : "Send"}
           </Button>

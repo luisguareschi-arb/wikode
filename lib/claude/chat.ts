@@ -48,7 +48,8 @@ function buildContextBlock(chunks: SearchResult[]): string {
 export function streamChat(
   userMessage: string,
   history: ChatMessage[],
-  context: SearchResult[]
+  context: SearchResult[],
+  onFinish?: (text: string) => void | Promise<void>
 ) {
   const contextBlock = buildContextBlock(context);
   const systemWithContext = contextBlock
@@ -56,13 +57,19 @@ export function streamChat(
     : SYSTEM_PROMPT;
 
   return streamText({
-    model: anthropic("claude-sonnet-4-20250514"),
+    model: anthropic("claude-sonnet-4-6"),
     system: systemWithContext,
     messages: [
       ...trimHistory(history).map((m) => ({ role: m.role, content: m.content })),
       { role: "user" as const, content: userMessage },
     ],
     maxTokens: 4096,
+    onFinish: async ({ text }) => {
+      await onFinish?.(text);
+    },
+    onError: ({ error }) => {
+      console.error("[streamChat] Anthropic error:", error);
+    },
   });
 }
 

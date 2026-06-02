@@ -18,6 +18,7 @@ export default function ChatPage() {
       </div>
       <div className="bg-white">
         <ChatWindow
+          key="new-chat"
           repoIds={repoIds}
           placeholder="Start a new conversation..."
         />
