@@ -108,15 +108,20 @@ const markdownComponents: Components = {
             <div className="px-3 py-2.5">
               {tokens.map((line, i) => {
                 const lineProps = getLineProps({ line, key: i });
-                const { className: lpClassName, ...restLineProps } = lineProps as {
+                const { key: lineKey, className: lpClassName, ...restLineProps } = lineProps as {
+                  key?: React.Key;
                   className?: string;
                 };
                 return (
-                  <div key={i} {...restLineProps} className={`${lpClassName ?? ""} whitespace-pre`}>
+                  <div
+                    key={lineKey ?? i}
+                    {...restLineProps}
+                    className={`${lpClassName ?? ""} whitespace-pre`}
+                  >
                     {line.map((token, tokenIndex) => {
                       const tokenProps = getTokenProps({ token, key: tokenIndex });
                       const { key: tokenKey, ...restTokenProps } = tokenProps as { key?: React.Key };
-                      return <span key={tokenIndex} {...restTokenProps} />;
+                      return <span key={tokenKey ?? tokenIndex} {...restTokenProps} />;
                     })}
                   </div>
                 );

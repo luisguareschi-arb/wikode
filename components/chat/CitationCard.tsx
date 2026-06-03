@@ -55,12 +55,20 @@ function CitationCodeBlock({ code, filePath }: { code: string; filePath: string 
         <div className="overflow-x-auto px-3 py-2 font-mono text-[12px] leading-relaxed">
           {tokens.map((line, lineIndex) => {
             const lineProps = getLineProps({ line, key: lineIndex });
-            const { className, ...restLineProps } = lineProps as { className?: string };
+            const { key: lineKey, className, ...restLineProps } = lineProps as {
+              key?: React.Key;
+              className?: string;
+            };
             return (
-              <div key={lineIndex} {...restLineProps} className={cn(className, "whitespace-pre")}>
+              <div
+                key={lineKey ?? lineIndex}
+                {...restLineProps}
+                className={cn(className, "whitespace-pre")}
+              >
                 {line.map((token, tokenIndex) => {
                   const tokenProps = getTokenProps({ token, key: tokenIndex });
-                  return <span key={tokenIndex} {...tokenProps} />;
+                  const { key: tokenKey, ...restTokenProps } = tokenProps as { key?: React.Key };
+                  return <span key={tokenKey ?? tokenIndex} {...restTokenProps} />;
                 })}
               </div>
             );
