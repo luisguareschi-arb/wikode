@@ -79,7 +79,7 @@ export default async function AdminPage() {
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>GitHub App</CardDescription>
-            <CardTitle className="text-base truncate">
+            <CardTitle className="text-3xl truncate">
               {appSlug ?? "Not configured"}
             </CardTitle>
           </CardHeader>

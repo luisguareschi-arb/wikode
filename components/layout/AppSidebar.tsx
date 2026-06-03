@@ -104,7 +104,7 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
               className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]"
               strokeWidth={1.75}
             />
-            Admin
+            Settings
           </Link>
         ) : null}
       </nav>
