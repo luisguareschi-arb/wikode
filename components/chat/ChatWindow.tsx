@@ -199,9 +199,15 @@ export function ChatWindow({
       role: "user",
       content: userMessage,
     };
-    setMessages((prev) => [...prev, userEntry]);
+    const assistantId = `assistant-${Date.now()}`;
+    setMessages((prev) => [
+      ...prev,
+      userEntry,
+      { id: assistantId, role: "assistant", content: "" },
+    ]);
 
     let resolvedThreadId = activeThreadId;
+    let navigateAfterStream = false;
     if (!resolvedThreadId) {
       const threadRes = await fetch("/api/threads", {
         method: "POST",
@@ -217,18 +223,21 @@ export function ChatWindow({
       };
       if (!threadRes.ok) {
         setError(threadData.error ?? "Failed to create conversation.");
+        setMessages((prev) => prev.filter((msg) => msg.id !== assistantId));
         setSending(false);
         return;
       }
       resolvedThreadId = threadData.thread?.id;
       if (!resolvedThreadId) {
         setError("Failed to create conversation.");
+        setMessages((prev) => prev.filter((msg) => msg.id !== assistantId));
         setSending(false);
         return;
       }
       setActiveThreadId(resolvedThreadId);
       window.dispatchEvent(new CustomEvent("wikode:threads-changed"));
-      router.replace(`/chat/${resolvedThreadId}`);
+      navigateAfterStream = true;
+      window.history.replaceState(null, "", `/chat/${resolvedThreadId}`);
     }
 
     const response = await fetch("/api/chat", {
@@ -246,21 +255,23 @@ export function ChatWindow({
         error?: string;
       } | null;
       setError(errBody?.error ?? `Chat failed (${response.status}).`);
+      setMessages((prev) => prev.filter((msg) => msg.id !== assistantId));
       setSending(false);
+      if (navigateAfterStream && resolvedThreadId) {
+        router.replace(`/chat/${resolvedThreadId}`);
+      }
       return;
     }
 
     if (!response.body) {
       setError("No response from chat service.");
+      setMessages((prev) => prev.filter((msg) => msg.id !== assistantId));
       setSending(false);
+      if (navigateAfterStream && resolvedThreadId) {
+        router.replace(`/chat/${resolvedThreadId}`);
+      }
       return;
     }
-
-    const assistantId = `assistant-${Date.now()}`;
-    setMessages((prev) => [
-      ...prev,
-      { id: assistantId, role: "assistant", content: "" },
-    ]);
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
@@ -281,6 +292,9 @@ export function ChatWindow({
     }
 
     setSending(false);
+    if (navigateAfterStream && resolvedThreadId) {
+      router.replace(`/chat/${resolvedThreadId}`);
+    }
   };
 
   const composer = (

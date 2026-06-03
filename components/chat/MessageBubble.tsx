@@ -103,33 +103,38 @@ export function MessageBubble({ message }: { message: ChatMessageItem }) {
   const displayContent = (message.content || "")
     .replace(citationPattern, "")
     .trim();
-  const effectiveContent = displayContent || (!isUser ? "Thinking…" : "");
+  const isThinking = !isUser && !displayContent;
 
   if (isUser) {
     return (
       <div className="w-full sticky top-0">
         <div className="inline-block w-full max-w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2">
           <p className="whitespace-pre-wrap text-[14px] leading-[1.6] text-[hsl(var(--app-text))]">
-            {effectiveContent}
+            {displayContent}
           </p>
         </div>
       </div>
     );
   }
 
+  if (isThinking) {
+    return (
+      <div className="w-full px-3 py-1">
+        <p className="animate-pulse text-[14px] text-[hsl(var(--app-text-muted))]">
+          Thinking…
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full py-1 px-3">
-      <div
-        className={cn(
-          "max-w-none",
-          !effectiveContent && "text-[hsl(var(--app-text-muted))]",
-        )}
-      >
+      <div className="max-w-none">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
           components={markdownComponents}
         >
-          {effectiveContent}
+          {displayContent}
         </ReactMarkdown>
       </div>
       {citations.length > 0 ? (
