@@ -7,7 +7,6 @@ import { RepoCard } from "@/components/admin/RepoCard";
 import { AddRepoModal } from "@/components/admin/AddRepoModal";
 import { Plus, GitBranch, Loader2, ExternalLink } from "lucide-react";
 import { useSearchParams } from "next/navigation";
-import { Input } from "@/components/ui/input";
 
 interface Repo {
   id: string;
@@ -19,27 +18,66 @@ interface Repo {
   updatedAt: string;
 }
 
+interface GitHubInstallation {
+  id: number;
+  accountLogin: string;
+  accountType: string;
+}
+
+function persistInstallationId(installationId: string) {
+  return fetch("/api/github/installations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ installationId }),
+  });
+}
+
 function ReposContent() {
+  const searchParams = useSearchParams();
   const [repos, setRepos] = useState<Repo[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [cookieInstallationId, setCookieInstallationId] = useState<
+  const [installations, setInstallations] = useState<GitHubInstallation[]>([]);
+  const [installationsLoading, setInstallationsLoading] = useState(true);
+  const [resolvedInstallationId, setResolvedInstallationId] = useState<
     string | null
   >(null);
-  const searchParams = useSearchParams();
-  const [installationIdInput, setInstallationIdInput] = useState<string>();
-  const installationIdFromUrl = searchParams.get("installation_id");
-  const installationId = installationIdFromUrl ?? cookieInstallationId;
 
-  // Callback stores gh_installation_id in an httpOnly cookie; read it when URL has no param
+  const installationIdFromUrl = searchParams.get("installation_id");
+
   useEffect(() => {
-    if (installationIdFromUrl) return;
-    fetch("/api/github/installation")
-      .then((r) => r.json())
-      .then((d: { installationId?: string }) => {
-        if (d.installationId) setCookieInstallationId(d.installationId);
-      })
-      .catch(() => {});
+    let cancelled = false;
+
+    (async () => {
+      setInstallationsLoading(true);
+      try {
+        const res = await fetch("/api/github/installations");
+        const data = await res.json();
+        if (cancelled || !res.ok) return;
+
+        setInstallations(data.installations ?? []);
+
+        if (installationIdFromUrl) {
+          setResolvedInstallationId(installationIdFromUrl);
+          await persistInstallationId(installationIdFromUrl);
+          return;
+        }
+
+        const suggested = data.suggestedInstallationId as string | null;
+        if (suggested) {
+          setResolvedInstallationId(suggested);
+          if (!data.storedInstallationId) {
+            await persistInstallationId(suggested);
+          }
+        }
+      } finally {
+        if (!cancelled) setInstallationsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [installationIdFromUrl]);
 
   const loadRepos = useCallback(async () => {
@@ -51,10 +89,8 @@ function ReposContent() {
 
   useEffect(() => {
     loadRepos();
-    if (installationId) setModalOpen(true);
-  }, [loadRepos, installationId]);
+  }, [loadRepos]);
 
-  // Poll while repos are actively indexing
   useEffect(() => {
     const hasActive = repos.some(
       (r) => r.status === "PENDING" || r.status === "INDEXING",
@@ -74,18 +110,22 @@ function ReposContent() {
     await loadRepos();
   };
 
+  const selectInstallation = async (id: string) => {
+    setResolvedInstallationId(id);
+    await persistInstallationId(id);
+  };
+
   const appSlug = process.env.NEXT_PUBLIC_GITHUB_APP_SLUG;
   const connectUrl = appSlug
     ? `https://github.com/apps/${appSlug}/installations/new`
     : null;
 
-  const handleAddInstallationId = async () => {
-    if (!installationIdInput) return;
-    // Set the installation ID in search params
-    const url = new URL(window.location.href);
-    url.searchParams.set("installation_id", installationIdInput);
-    window.history.pushState({}, "", url.toString());
-  };
+  const hasInstallation = !!resolvedInstallationId;
+  const activeInstallation = installations.find(
+    (i) => String(i.id) === resolvedInstallationId,
+  );
+  const showInstallationPicker =
+    !installationsLoading && installations.length > 1 && !hasInstallation;
 
   return (
     <div className="p-8 max-w-4xl">
@@ -95,6 +135,12 @@ function ReposContent() {
           <p className="mt-1 text-sm text-gray-500">
             Manage which codebases are indexed and searchable.
           </p>
+          {activeInstallation && (
+            <p className="mt-1 text-xs text-gray-400">
+              Connected: {activeInstallation.accountLogin} (
+              {activeInstallation.accountType})
+            </p>
+          )}
         </div>
         <div className="flex gap-2">
           {connectUrl && (
@@ -108,14 +154,41 @@ function ReposContent() {
           <Button
             onClick={() => setModalOpen(true)}
             className="gap-2"
-            disabled={!installationId}
-            title={!installationId ? "Connect GitHub App first" : undefined}
+            disabled={!hasInstallation || installationsLoading}
+            title={
+              !hasInstallation
+                ? "Connect or select a GitHub App installation first"
+                : undefined
+            }
           >
             <Plus className="h-4 w-4" />
             Add Repos
           </Button>
         </div>
       </div>
+
+      {showInstallationPicker && (
+        <div className="mb-6 rounded-lg border bg-gray-50 p-4">
+          <p className="text-sm font-medium text-gray-900">
+            Select a GitHub App installation
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Multiple installations were found for this app.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {installations.map((inst) => (
+              <Button
+                key={inst.id}
+                variant="outline"
+                size="sm"
+                onClick={() => selectInstallation(String(inst.id))}
+              >
+                {inst.accountLogin} ({inst.accountType})
+              </Button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {loading ? (
         <div className="flex items-center justify-center py-16">
@@ -128,30 +201,20 @@ function ReposContent() {
             No repositories indexed
           </h3>
           <p className="mt-1 text-sm text-gray-500">
-            Connect your GitHub App and add repositories to get started.
+            {hasInstallation
+              ? "Click Add Repos to choose repositories from GitHub."
+              : "Connect your GitHub App, then add repositories to get started."}
           </p>
-          <p className="mt-4 text-sm text-gray-500">
-            Already connected? Paste your installation ID below to add
-            repositories.
-          </p>
-          <div className="flex gap-2 justify-center items-center mt-4">
-            <Input
-              type="text"
-              placeholder="Installation ID"
-              value={installationIdInput}
-              onChange={(e) => setInstallationIdInput(e.target.value)}
-              className="w-fit"
-            />
-            <Button
-              variant="outline"
-              className="gap-2"
-              onClick={handleAddInstallationId}
-              disabled={!installationIdInput}
-            >
-              <Plus className="h-4 w-4" />
-              Add Installation ID
-            </Button>
-          </div>
+          {!hasInstallation &&
+            !installationsLoading &&
+            installations.length === 0 && (
+              <p className="mt-4 text-sm text-amber-700 max-w-md">
+                No installations found. Use Connect GitHub to install the app on
+                your org, and set the Setup URL to{" "}
+                <code className="text-xs">/api/github/callback</code> in your
+                app settings.
+              </p>
+            )}
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
@@ -168,7 +231,6 @@ function ReposContent() {
 
       <AddRepoModal
         open={modalOpen}
-        installationId={installationId}
         onClose={() => setModalOpen(false)}
         onAdded={loadRepos}
       />

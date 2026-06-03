@@ -23,17 +23,11 @@ interface GithubRepo {
 
 interface AddRepoModalProps {
   open: boolean;
-  installationId: string | null;
   onClose: () => void;
   onAdded: () => void;
 }
 
-export function AddRepoModal({
-  open,
-  installationId,
-  onClose,
-  onAdded,
-}: AddRepoModalProps) {
+export function AddRepoModal({ open, onClose, onAdded }: AddRepoModalProps) {
   const [repos, setRepos] = useState<GithubRepo[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(false);
@@ -41,20 +35,44 @@ export function AddRepoModal({
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open || !installationId) return;
+    if (!open) {
+      setRepos([]);
+      setSelected(new Set());
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
     setLoading(true);
     setError(null);
-    fetch(`/api/github/repos?installation_id=${installationId}`)
-      .then((r) => r.json())
-      .then((d) => {
-        setRepos(d.repos ?? []);
-        setLoading(false);
+
+    fetch("/api/github/repos")
+      .then(async (res) => {
+        const data = await res.json();
+        if (cancelled) return;
+        if (!res.ok) {
+          setError(
+            typeof data.error === "string"
+              ? data.error
+              : "Failed to load repositories",
+          );
+          setRepos([]);
+          return;
+        }
+        setRepos(data.repos ?? []);
       })
       .catch(() => {
-        setError("Failed to load repositories");
-        setLoading(false);
+        if (!cancelled) setError("Failed to load repositories");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
       });
-  }, [open, installationId]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open]);
 
   const toggle = (id: number) => {
     setSelected((prev) => {
@@ -66,17 +84,14 @@ export function AddRepoModal({
   };
 
   const handleAdd = async () => {
-    if (selected.size === 0 || !installationId) return;
+    if (selected.size === 0) return;
     setSaving(true);
     const toAdd = repos.filter((r) => selected.has(r.githubRepoId));
     for (const repo of toAdd) {
       await fetch("/api/repos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...repo,
-          installationId: parseInt(installationId, 10),
-        }),
+        body: JSON.stringify(repo),
       });
     }
     setSaving(false);
@@ -85,7 +100,7 @@ export function AddRepoModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent onClose={onClose} className="max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add Repositories</DialogTitle>

@@ -5,14 +5,27 @@ import { enqueueIngestion } from "@/lib/queue/index";
 import { getInstallationOctokit } from "@/lib/github/app";
 import { z } from "zod";
 
+const COOKIE_NAME = "gh_installation_id";
+
 const AddRepoSchema = z.object({
   githubRepoId: z.number(),
-  installationId: z.number(),
+  installationId: z.number().optional(),
   owner: z.string(),
   name: z.string(),
   fullName: z.string(),
   defaultBranch: z.string().default("main"),
 });
+
+function installationIdFromRequest(
+  req: NextRequest,
+  fromBody: number | undefined,
+): number | null {
+  if (fromBody != null) return fromBody;
+  const cookie = req.cookies.get(COOKIE_NAME)?.value;
+  if (!cookie) return null;
+  const id = parseInt(cookie, 10);
+  return Number.isFinite(id) ? id : null;
+}
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -30,8 +43,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { githubRepoId, installationId, owner, name, fullName, defaultBranch } =
-    parsed.data;
+  const { githubRepoId, owner, name, fullName, defaultBranch } = parsed.data;
+  const installationId = installationIdFromRequest(
+    req,
+    parsed.data.installationId,
+  );
+  if (installationId == null) {
+    return NextResponse.json(
+      { error: "No GitHub App installation connected" },
+      { status: 400 },
+    );
+  }
 
   // Check if already indexed
   const existing = await prisma.repository.findUnique({

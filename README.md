@@ -88,6 +88,8 @@ The GitHub App is how Wikode gets read access to your organisation's private rep
    - **GitHub App name**: `wikode-yourname` (must be globally unique)
    - **Homepage URL**: `http://localhost:3000`
    - **Callback URL**: `http://localhost:3000/api/github/callback`
+   - **Setup URL** (post-install redirect): `http://localhost:3000/api/github/callback`
+     (required for GitHub to send `installation_id` back after install; use your production URL in prod)
    - **Webhook URL**: `http://localhost:3000/api/webhooks/github`
      (for local dev use a tunnel like [ngrok](https://ngrok.com): `ngrok http 3000`)
      (delta indexing only runs for pushes on each repository's configured default branch)
@@ -120,9 +122,12 @@ Paste the output (starts with `-----BEGIN RSA PRIVATE KEY-----\n...`) as `GITHUB
 
 #### Install the App
 
-1. Go to `https://github.com/apps/YOUR_APP_SLUG` and click **Install**
-2. Choose the organisation or account and select which repos to allow
-3. After installation you'll be redirected to `/admin/repos?installation_id=XXXXX` — this is your installation ID (saved automatically by Wikode)
+1. Sign in to Wikode as an **admin** before installing (the callback requires an admin session).
+2. Go to `https://github.com/apps/YOUR_APP_SLUG` and click **Install**
+3. Choose the organisation or account and select which repos to allow
+4. After installation, GitHub redirects to the **Setup URL** with `installation_id`; Wikode saves it and sends you to `/admin/repos`.
+
+If the redirect does not run, open **Admin → Repositories** — Wikode discovers installations via the GitHub App API using your app credentials.
 
 ---
 

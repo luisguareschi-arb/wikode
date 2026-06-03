@@ -34,6 +34,31 @@ export async function getInstallationOctokit(
   return app.getInstallationOctokit(installationId) as Promise<Octokit>;
 }
 
+export type AppInstallationSummary = {
+  id: number;
+  accountLogin: string;
+  accountType: string;
+};
+
+/** Lists every installation of this GitHub App (app JWT; no callback required). */
+export async function listAppInstallations(): Promise<
+  AppInstallationSummary[]
+> {
+  const app = getApp();
+  const installations: AppInstallationSummary[] = [];
+  for await (const { installation } of app.eachInstallation.iterator()) {
+    const account = installation.account;
+    installations.push({
+      id: installation.id,
+      accountLogin:
+        account && "login" in account ? String(account.login) : "unknown",
+      accountType:
+        account && "type" in account ? String(account.type) : "Unknown",
+    });
+  }
+  return installations;
+}
+
 export function getGitHubApp(): App {
   return getApp();
 }
