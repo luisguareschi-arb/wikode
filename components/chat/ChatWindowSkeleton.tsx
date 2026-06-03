@@ -23,7 +23,7 @@ function ComposerSkeleton({ mode }: { mode: "empty" | "follow-up" }) {
       )}
       <div
         className={cn(
-          "rounded-xl border border-[hsl(var(--border))] bg-white",
+          "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))]",
           !isEmpty && "relative",
         )}
       >
@@ -78,7 +78,7 @@ export function ChatThreadSkeleton() {
       <div className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-3xl space-y-8 px-6 py-6">
           <div className="w-full">
-            <div className="rounded-lg border border-[hsl(var(--border))] bg-white px-4 py-3">
+            <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-3">
               <div className="space-y-2.5">
                 <Skeleton className="h-3.5 w-full" />
                 <Skeleton className="h-3.5 w-4/5" />

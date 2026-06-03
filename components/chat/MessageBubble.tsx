@@ -2,11 +2,11 @@
 
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Highlight, type Language, themes } from "prism-react-renderer";
 import {
   CitationCard,
   type CitationData,
 } from "@/components/chat/CitationCard";
+import { MarkdownCodeBlock } from "@/components/chat/MarkdownCodeBlock";
 import { cn } from "@/lib/utils";
 
 export interface ChatMessageItem {
@@ -83,83 +83,7 @@ const markdownComponents: Components = {
       {children}
     </a>
   ),
-  code: (props) => {
-    const { className, children } = props;
-    const inline = (props as { inline?: boolean }).inline;
-    if (inline) {
-      return (
-        <code className="rounded-[4px] bg-[hsl(var(--app-code-bg))] px-1.5 py-0.5 font-mono text-[13px] text-[hsl(var(--app-text))]">
-          {children}
-        </code>
-      );
-    }
-
-    const match = /language-(\w+)/.exec(className ?? "");
-    const code = String(children ?? "").replace(/\n$/, "");
-
-    if (!match) {
-      const isSingleShortLine = !code.includes("\n") && code.length <= 40;
-      if (isSingleShortLine) {
-        return (
-          <code className="inline-block rounded-[4px] bg-[hsl(var(--app-code-bg))] px-1.5 py-0.5 font-mono text-[13px] text-[hsl(var(--app-text))]">
-            {code}
-          </code>
-        );
-      }
-
-      return (
-        <code className="mt-2 block overflow-x-auto rounded-lg bg-[hsl(var(--app-code-bg))] px-3 py-2.5 font-mono text-[13px] leading-relaxed text-[hsl(var(--app-text))]">
-          {code}
-        </code>
-      );
-    }
-
-    const language = match[1] as Language;
-
-    return (
-      <code className="mt-2 block overflow-hidden rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--app-code-bg))] font-mono text-[13px] leading-relaxed text-[hsl(var(--app-text))]">
-        <Highlight theme={themes.github} code={code} language={language}>
-          {({ tokens, getLineProps, getTokenProps }) => (
-            <div className="px-3 py-2.5">
-              {tokens.map((line, i) => {
-                const lineProps = getLineProps({ line, key: i });
-                const {
-                  key: lineKey,
-                  className: lpClassName,
-                  ...restLineProps
-                } = lineProps as {
-                  key?: React.Key;
-                  className?: string;
-                };
-                return (
-                  <div
-                    key={lineKey ?? i}
-                    {...restLineProps}
-                    className={`${lpClassName ?? ""} whitespace-pre`}
-                  >
-                    {line.map((token, tokenIndex) => {
-                      const tokenProps = getTokenProps({
-                        token,
-                        key: tokenIndex,
-                      });
-                      const { key: tokenKey, ...restTokenProps } =
-                        tokenProps as { key?: React.Key };
-                      return (
-                        <span
-                          key={tokenKey ?? tokenIndex}
-                          {...restTokenProps}
-                        />
-                      );
-                    })}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </Highlight>
-      </code>
-    );
-  },
+  code: (props) => <MarkdownCodeBlock {...props} />,
   blockquote: ({ children }) => (
     <blockquote className="border-l-2 border-[hsl(var(--border))] pl-3 text-[14px] italic text-[hsl(var(--app-text-muted))]">
       {children}
@@ -184,7 +108,7 @@ export function MessageBubble({ message }: { message: ChatMessageItem }) {
   if (isUser) {
     return (
       <div className="w-full sticky top-0">
-        <div className="inline-block w-full max-w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2">
+        <div className="inline-block w-full max-w-full rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2">
           <p className="whitespace-pre-wrap text-[14px] leading-[1.6] text-[hsl(var(--app-text))]">
             {effectiveContent}
           </p>

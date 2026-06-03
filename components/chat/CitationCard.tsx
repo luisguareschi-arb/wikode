@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 import { ExternalLink, FileCode2 } from "lucide-react";
-import { Highlight, type Language, themes } from "prism-react-renderer";
-import { cn } from "@/lib/utils";
+import { type Language } from "prism-react-renderer";
+import { CodeHighlight } from "@/components/chat/CodeHighlight";
 
 export interface CitationData {
   filePath: string;
@@ -56,40 +56,11 @@ function CitationCodeBlock({
   const language = languageFromFilePath(filePath);
 
   return (
-    <Highlight theme={themes.github} code={code} language={language}>
-      {({ tokens, getLineProps, getTokenProps }) => (
-        <div className="overflow-x-auto px-3 py-2 font-mono text-[12px] leading-relaxed">
-          {tokens.map((line, lineIndex) => {
-            const lineProps = getLineProps({ line, key: lineIndex });
-            const {
-              key: lineKey,
-              className,
-              ...restLineProps
-            } = lineProps as {
-              key?: React.Key;
-              className?: string;
-            };
-            return (
-              <div
-                key={lineKey ?? lineIndex}
-                {...restLineProps}
-                className={cn(className, "whitespace-pre")}
-              >
-                {line.map((token, tokenIndex) => {
-                  const tokenProps = getTokenProps({ token, key: tokenIndex });
-                  const { key: tokenKey, ...restTokenProps } = tokenProps as {
-                    key?: React.Key;
-                  };
-                  return (
-                    <span key={tokenKey ?? tokenIndex} {...restTokenProps} />
-                  );
-                })}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </Highlight>
+    <CodeHighlight
+      code={code}
+      language={language}
+      className="px-3 py-2 font-mono text-[12px] leading-relaxed"
+    />
   );
 }
 

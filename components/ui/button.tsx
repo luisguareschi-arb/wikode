@@ -3,19 +3,22 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--app-text))] focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[hsl(var(--ring))] focus-visible:ring-offset-2 focus-visible:ring-offset-[hsl(var(--background))] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-[hsl(var(--app-text))] text-white hover:bg-[hsl(0_0%_20%)]",
+          "bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] hover:opacity-90",
+        accent:
+          "bg-[hsl(var(--accent))] text-[hsl(var(--accent-foreground))] hover:opacity-90",
         destructive: "bg-red-500 text-white hover:bg-red-600",
         outline:
-          "border border-[hsl(var(--border))] bg-white hover:bg-black/4 hover:text-[hsl(var(--app-text))]",
+          "border border-[hsl(var(--border))] bg-[hsl(var(--card))] text-[hsl(var(--app-text))] hover:bg-black/4 dark:hover:bg-white/8",
         secondary:
-          "bg-[hsl(var(--app-sidebar))] text-[hsl(var(--app-text))] hover:bg-black/[0.06]",
-        ghost: "hover:bg-black/4 hover:text-[hsl(var(--app-text))]",
-        link: "text-blue-600 underline-offset-4 hover:underline",
+          "bg-[hsl(var(--app-sidebar))] text-[hsl(var(--app-text))] hover:bg-black/4 dark:hover:bg-white/8",
+        ghost:
+          "text-[hsl(var(--app-text))] hover:bg-black/4 dark:hover:bg-white/8",
+        link: "text-[hsl(var(--accent))] underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2",

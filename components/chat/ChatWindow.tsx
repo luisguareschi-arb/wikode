@@ -59,8 +59,8 @@ function ChatComposer({
       )}
       <div
         className={cn(
-          "rounded-xl border border-[hsl(var(--border))] bg-white",
-          "focus-within:border-[hsl(0_0%_80%)]",
+          "rounded-xl border border-[hsl(var(--border))] bg-[hsl(var(--card))]",
+          "focus-within:border-[hsl(var(--ring))]",
           !isEmpty && "relative",
         )}
       >
@@ -93,8 +93,9 @@ function ChatComposer({
               {error ?? helperText}
             </p>
             <Button
+              variant="accent"
               size="icon"
-              className="h-8 w-8 shrink-0 rounded-full bg-[hsl(var(--app-text))] text-white hover:bg-[hsl(0_0%_20%)]"
+              className="h-8 w-8 shrink-0 rounded-full"
               onClick={() => void onSend()}
               disabled={disabled}
               aria-label={sending ? "Sending" : "Send message"}
@@ -108,8 +109,9 @@ function ChatComposer({
           </div>
         ) : (
           <Button
+            variant="accent"
             size="icon"
-            className="absolute bottom-3 right-3 h-8 w-8 rounded-full bg-[hsl(var(--app-text))] text-white hover:bg-[hsl(0_0%_20%)]"
+            className="absolute bottom-3 right-3 h-8 w-8 rounded-full"
             onClick={() => void onSend()}
             disabled={disabled}
             aria-label={sending ? "Sending" : "Send message"}
