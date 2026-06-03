@@ -203,6 +203,9 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
             <p className="truncate text-[13px] font-medium text-[hsl(var(--app-text))]">
               {user.name ?? "User"}
             </p>
+            <p className="text-xs text-[hsl(var(--app-text-muted))]">
+              {user.email ?? "No email"}
+            </p>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

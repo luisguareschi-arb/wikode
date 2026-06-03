@@ -7,6 +7,7 @@ import { RepoCard } from "@/components/admin/RepoCard";
 import { AddRepoModal } from "@/components/admin/AddRepoModal";
 import { Plus, GitBranch, Loader2, ExternalLink } from "lucide-react";
 import { useSearchParams } from "next/navigation";
+import { Input } from "@/components/ui/input";
 
 interface Repo {
   id: string;
@@ -26,6 +27,7 @@ function ReposContent() {
     string | null
   >(null);
   const searchParams = useSearchParams();
+  const [installationIdInput, setInstallationIdInput] = useState<string>();
   const installationIdFromUrl = searchParams.get("installation_id");
   const installationId = installationIdFromUrl ?? cookieInstallationId;
 
@@ -77,6 +79,14 @@ function ReposContent() {
     ? `https://github.com/apps/${appSlug}/installations/new`
     : null;
 
+  const handleAddInstallationId = async () => {
+    if (!installationIdInput) return;
+    // Set the installation ID in search params
+    const url = new URL(window.location.href);
+    url.searchParams.set("installation_id", installationIdInput);
+    window.history.pushState({}, "", url.toString());
+  };
+
   return (
     <div className="p-8 max-w-4xl">
       <div className="flex items-center justify-between mb-6">
@@ -120,19 +130,28 @@ function ReposContent() {
           <p className="mt-1 text-sm text-gray-500">
             Connect your GitHub App and add repositories to get started.
           </p>
-          {connectUrl && (
-            <a
-              href={connectUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-4"
+          <p className="mt-4 text-sm text-gray-500">
+            Already connected? Paste your installation ID below to add
+            repositories.
+          </p>
+          <div className="flex gap-2 justify-center items-center mt-4">
+            <Input
+              type="text"
+              placeholder="Installation ID"
+              value={installationIdInput}
+              onChange={(e) => setInstallationIdInput(e.target.value)}
+              className="w-fit"
+            />
+            <Button
+              variant="outline"
+              className="gap-2"
+              onClick={handleAddInstallationId}
+              disabled={!installationIdInput}
             >
-              <Button variant="outline" size="sm" className="gap-2">
-                <ExternalLink className="h-4 w-4" />
-                Connect GitHub App
-              </Button>
-            </a>
-          )}
+              <Plus className="h-4 w-4" />
+              Add Installation ID
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
