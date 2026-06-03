@@ -37,8 +37,7 @@
   /* Mapped from Cursor-like palette:
      sidebar/chrome #141414 → --app-sidebar, shell chrome
      editor         #181818 → --app-surface, main content
-     base           #E4E4E4 → --app-text
-     accent         #5DA1E5 → --accent, --ring
+     base           #E4E4E4 → --app-text, --accent
   */
   --background: 0 0% 8%;
   --foreground: 0 0% 89.4%;
@@ -52,13 +51,13 @@
   --secondary-foreground: 0 0% 89.4%;
   --muted: 0 0% 13%;
   --muted-foreground: 0 0% 55%;
-  --accent: 210 72% 63%;
+  --accent: 0 0% 89.4%; /* #E4E4E4 base */
   --accent-foreground: 0 0% 8%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 0 0% 89.4%;
   --border: 0 0% 16%;
   --input: 0 0% 16%;
-  --ring: 210 72% 63%;
+  --ring: 0 0% 89.4%;
 
   --app-sidebar: 0 0% 8%; /* #141414 sidebar / chrome */
   --app-surface: 0 0% 9.4%; /* #181818 editor */

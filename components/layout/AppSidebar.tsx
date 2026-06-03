@@ -4,8 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import {
-  Check,
-  ChevronRight,
   Eclipse,
   Loader2,
   LogOut,
@@ -17,6 +15,7 @@ import {
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
+import { Switch } from "@/components/ui/switch";
 import {
   groupThreadsByDate,
   type ThreadListItem,
@@ -32,29 +31,15 @@ interface AppSidebarProps {
   };
 }
 
-type ThemeOption = "light" | "dark" | "system";
-
-const THEME_OPTIONS: { value: ThemeOption; label: string }[] = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-  { value: "system", label: "System" },
-];
-
-function themeLabel(theme: ThemeOption | undefined) {
-  return (
-    THEME_OPTIONS.find((option) => option.value === theme)?.label ?? "System"
-  );
-}
-
 export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [threads, setThreads] = useState<ThreadListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [appearanceOpen, setAppearanceOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const isDark = mounted && resolvedTheme === "dark";
 
   useEffect(() => {
     setMounted(true);
@@ -229,62 +214,25 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
                   type="button"
                   className="fixed inset-0 z-10"
                   aria-label="Close menu"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    setAppearanceOpen(false);
-                  }}
+                  onClick={() => setMenuOpen(false)}
                 />
                 <div className="absolute bottom-full right-0 z-20 mb-1 min-w-[200px] rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--popover))] py-1 shadow-lg">
-                  <div
-                    className="relative"
-                    onMouseEnter={() => setAppearanceOpen(true)}
-                    onMouseLeave={() => setAppearanceOpen(false)}
-                  >
-                    <button
-                      type="button"
-                      className={cn(
-                        "flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-[hsl(var(--app-text))] hover:bg-black/4 dark:hover:bg-white/8",
-                        appearanceOpen && "bg-black/4 dark:bg-white/8",
-                      )}
-                      onClick={() => setAppearanceOpen((open) => !open)}
-                    >
-                      <Eclipse
-                        className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--app-text-muted))]"
-                        strokeWidth={1.75}
-                      />
-                      <span className="flex-1">Appearance</span>
-                      <span className="text-[hsl(var(--app-text-muted))]">
-                        {mounted ? themeLabel(theme as ThemeOption) : "System"}
-                      </span>
-                      <ChevronRight
-                        className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--app-text-muted))]"
-                        strokeWidth={1.75}
-                      />
-                    </button>
-                    {appearanceOpen ? (
-                      <div className="absolute bottom-0 left-full z-30 ml-1 min-w-[140px] rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--popover))] py-1 shadow-lg">
-                        {THEME_OPTIONS.map((option) => {
-                          const isSelected =
-                            mounted && (theme ?? "system") === option.value;
-                          return (
-                            <button
-                              key={option.value}
-                              type="button"
-                              className="flex w-full items-center justify-between px-3 py-2 text-left text-[13px] text-[hsl(var(--app-text))] hover:bg-black/4 dark:hover:bg-white/8"
-                              onClick={() => setTheme(option.value)}
-                            >
-                              {option.label}
-                              {isSelected ? (
-                                <Check
-                                  className="h-3.5 w-3.5 text-[hsl(var(--app-text-muted))]"
-                                  strokeWidth={1.75}
-                                />
-                              ) : null}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ) : null}
+                  <div className="flex w-full items-center gap-2 px-3 py-2">
+                    <Eclipse
+                      className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--app-text-muted))]"
+                      strokeWidth={1.75}
+                    />
+                    <span className="flex-1 text-[13px] text-[hsl(var(--app-text))]">
+                      Dark mode
+                    </span>
+                    <Switch
+                      checked={isDark}
+                      disabled={!mounted}
+                      aria-label="Toggle dark mode"
+                      onCheckedChange={(checked) =>
+                        setTheme(checked ? "dark" : "light")
+                      }
+                    />
                   </div>
                   <button
                     type="button"
