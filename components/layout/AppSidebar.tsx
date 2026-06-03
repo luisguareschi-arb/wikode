@@ -15,6 +15,12 @@ import {
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useTheme } from "next-themes";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import {
   groupThreadsByDate,
@@ -37,7 +43,6 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
   const { resolvedTheme, setTheme } = useTheme();
   const [threads, setThreads] = useState<ThreadListItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const isDark = mounted && resolvedTheme === "dark";
 
@@ -199,53 +204,48 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
               {user.name ?? "User"}
             </p>
           </div>
-          <div className="relative">
-            <button
-              type="button"
-              className="rounded-md p-1 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
-              aria-label="Account menu"
-              onClick={() => setMenuOpen((open) => !open)}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="rounded-md p-1 text-[hsl(var(--app-text-muted))] transition-colors hover:bg-black/4 hover:text-[hsl(var(--app-text))]"
+                aria-label="Account menu"
+              >
+                <MoreHorizontal className="h-4 w-4" strokeWidth={1.75} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              side="top"
+              align="end"
+              className="min-w-[200px] rounded-lg p-1"
             >
-              <MoreHorizontal className="h-4 w-4" strokeWidth={1.75} />
-            </button>
-            {menuOpen ? (
-              <>
-                <button
-                  type="button"
-                  className="fixed inset-0 z-10"
-                  aria-label="Close menu"
-                  onClick={() => setMenuOpen(false)}
+              <DropdownMenuItem
+                className="cursor-default text-[13px] focus:bg-black/4 dark:focus:bg-white/8"
+                onSelect={(event) => event.preventDefault()}
+              >
+                <Eclipse
+                  className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--app-text-muted))]"
+                  strokeWidth={1.75}
                 />
-                <div className="absolute bottom-full right-0 z-20 mb-1 min-w-[200px] rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--popover))] py-1 shadow-lg">
-                  <div className="flex w-full items-center gap-2 px-3 py-2">
-                    <Eclipse
-                      className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--app-text-muted))]"
-                      strokeWidth={1.75}
-                    />
-                    <span className="flex-1 text-[13px] text-[hsl(var(--app-text))]">
-                      Dark mode
-                    </span>
-                    <Switch
-                      checked={isDark}
-                      disabled={!mounted}
-                      aria-label="Toggle dark mode"
-                      onCheckedChange={(checked) =>
-                        setTheme(checked ? "dark" : "light")
-                      }
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-[13px] text-[hsl(var(--app-text))] hover:bg-black/4 dark:hover:bg-white/8"
-                    onClick={() => void signOut({ callbackUrl: "/login" })}
-                  >
-                    <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} />
-                    Sign out
-                  </button>
-                </div>
-              </>
-            ) : null}
-          </div>
+                <span className="flex-1">Dark mode</span>
+                <Switch
+                  checked={isDark}
+                  disabled={!mounted}
+                  aria-label="Toggle dark mode"
+                  onCheckedChange={(checked) =>
+                    setTheme(checked ? "dark" : "light")
+                  }
+                />
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-[13px] focus:bg-black/4 dark:focus:bg-white/8"
+                onClick={() => void signOut({ callbackUrl: "/login" })}
+              >
+                <LogOut className="h-3.5 w-3.5" strokeWidth={1.75} />
+                Sign out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </aside>
