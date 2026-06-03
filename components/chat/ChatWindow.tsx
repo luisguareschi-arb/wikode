@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 import { ArrowUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ChatHeader } from "@/components/chat/ChatHeader";
-import { MessageBubble, type ChatMessageItem } from "@/components/chat/MessageBubble";
+import {
+  MessageBubble,
+  type ChatMessageItem,
+} from "@/components/chat/MessageBubble";
 import { RepoBranchPicker } from "@/components/chat/RepoBranchPicker";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +61,7 @@ function ChatComposer({
         className={cn(
           "rounded-xl border border-[hsl(var(--border))] bg-white",
           "focus-within:border-[hsl(0_0%_80%)]",
-          !isEmpty && "relative"
+          !isEmpty && "relative",
         )}
       >
         <textarea
@@ -74,7 +77,9 @@ function ChatComposer({
           rows={isEmpty ? 4 : 2}
           className={cn(
             "w-full resize-none rounded-xl bg-transparent px-4 text-[14px] text-[hsl(var(--app-text))] placeholder:text-[hsl(var(--app-text-muted))] focus:outline-none",
-            isEmpty ? "min-h-[100px] pb-2 pt-4" : "min-h-[72px] py-3 pr-12 pb-10"
+            isEmpty
+              ? "min-h-[100px] pb-2 pt-4"
+              : "min-h-[72px] py-3 pr-12 pb-10",
           )}
         />
         {isEmpty ? (
@@ -82,7 +87,7 @@ function ChatComposer({
             <p
               className={cn(
                 "min-w-0 flex-1 truncate text-xs",
-                error ? "text-red-600" : "text-[hsl(var(--app-text-muted))]"
+                error ? "text-red-600" : "text-[hsl(var(--app-text-muted))]",
               )}
             >
               {error ?? helperText}
@@ -121,7 +126,7 @@ function ChatComposer({
         <p
           className={cn(
             "mt-1.5 text-center text-xs",
-            error ? "text-red-600" : "text-[hsl(var(--app-text-muted))]"
+            error ? "text-red-600" : "text-[hsl(var(--app-text-muted))]",
           )}
         >
           {error ?? helperText}
@@ -143,8 +148,12 @@ export function ChatWindow({
   const [messages, setMessages] = useState<ChatMessageItem[]>(initialMessages);
   const [value, setValue] = useState("");
   const [sending, setSending] = useState(false);
-  const [activeThreadId, setActiveThreadId] = useState<string | undefined>(threadId);
-  const [threadTitle, setThreadTitle] = useState(initialThreadTitle?.trim() ?? "");
+  const [activeThreadId, setActiveThreadId] = useState<string | undefined>(
+    threadId,
+  );
+  const [threadTitle, setThreadTitle] = useState(
+    initialThreadTitle?.trim() ?? "",
+  );
   const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const isEmpty = messages.length === 0;
@@ -163,7 +172,8 @@ export function ChatWindow({
   }, [repoIds]);
 
   const composerPlaceholder = isEmpty
-    ? (placeholder ?? "Ask Wikode to explore, explain, or find code in your repository...")
+    ? (placeholder ??
+      "Ask Wikode to explore, explain, or find code in your repository...")
     : "Add a follow-up";
 
   useEffect(() => {
@@ -199,7 +209,10 @@ export function ChatWindow({
           repoIds,
         }),
       });
-      const threadData = (await threadRes.json()) as { thread?: { id: string }; error?: string };
+      const threadData = (await threadRes.json()) as {
+        thread?: { id: string };
+        error?: string;
+      };
       if (!threadRes.ok) {
         setError(threadData.error ?? "Failed to create conversation.");
         setSending(false);
@@ -227,7 +240,9 @@ export function ChatWindow({
     });
 
     if (!response.ok) {
-      const errBody = (await response.json().catch(() => null)) as { error?: string } | null;
+      const errBody = (await response.json().catch(() => null)) as {
+        error?: string;
+      } | null;
       setError(errBody?.error ?? `Chat failed (${response.status}).`);
       setSending(false);
       return;
@@ -240,7 +255,10 @@ export function ChatWindow({
     }
 
     const assistantId = `assistant-${Date.now()}`;
-    setMessages((prev) => [...prev, { id: assistantId, role: "assistant", content: "" }]);
+    setMessages((prev) => [
+      ...prev,
+      { id: assistantId, role: "assistant", content: "" },
+    ]);
 
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
@@ -251,7 +269,11 @@ export function ChatWindow({
       if (chunk.value) {
         const text = decoder.decode(chunk.value, { stream: !done });
         setMessages((prev) =>
-          prev.map((msg) => (msg.id === assistantId ? { ...msg, content: msg.content + text } : msg))
+          prev.map((msg) =>
+            msg.id === assistantId
+              ? { ...msg, content: msg.content + text }
+              : msg,
+          ),
         );
       }
     }

@@ -19,12 +19,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!checkRateLimit(session.user.id, 20, 60_000)) {
-    return NextResponse.json({ error: "Too many requests. Try again shortly." }, { status: 429 });
+    return NextResponse.json(
+      { error: "Too many requests. Try again shortly." },
+      { status: 429 },
+    );
   }
 
   const { threadId, message, repoIds } = (await req.json()) as ChatRequestBody;
   if (!threadId || !message) {
-    return NextResponse.json({ error: "Missing threadId or message" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Missing threadId or message" },
+      { status: 400 },
+    );
   }
 
   // Load thread + history
@@ -66,14 +72,17 @@ export async function POST(req: NextRequest) {
       thread.repos.map((threadRepo) => ({
         fullName: threadRepo.repository.fullName,
         defaultBranch: threadRepo.repository.defaultBranch,
-      }))
+      })),
     );
     await prisma.message.create({
       data: {
         threadId,
         role: "assistant",
         content: fullResponse,
-        citations: citations.length > 0 ? (citations as unknown as Prisma.InputJsonValue) : undefined,
+        citations:
+          citations.length > 0
+            ? (citations as unknown as Prisma.InputJsonValue)
+            : undefined,
       },
     });
   });

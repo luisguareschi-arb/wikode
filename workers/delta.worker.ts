@@ -7,7 +7,8 @@ import { chunkFile } from "@/lib/embeddings/chunker";
 import { embedTexts } from "@/lib/embeddings/openai";
 
 async function processDelta(job: Job<DeltaJobData>): Promise<void> {
-  const { repoId, installationId, changedFiles, removedFiles, newSha } = job.data;
+  const { repoId, installationId, changedFiles, removedFiles, newSha } =
+    job.data;
 
   const repo = await prisma.repository.findUnique({ where: { id: repoId } });
   if (!repo) throw new Error(`Repository ${repoId} not found`);
@@ -29,7 +30,13 @@ async function processDelta(job: Job<DeltaJobData>): Promise<void> {
   // Re-index changed/added files
   for (const filePath of changedFiles) {
     try {
-      const blob = await getFileBlob(octokit, repo.owner, repo.name, filePath, newSha);
+      const blob = await getFileBlob(
+        octokit,
+        repo.owner,
+        repo.name,
+        filePath,
+        newSha,
+      );
       const language = detectLanguage(filePath);
 
       const existing = await prisma.repoFile.findUnique({
@@ -64,7 +71,7 @@ async function processDelta(job: Job<DeltaJobData>): Promise<void> {
           chunk.content,
           chunk.startLine,
           chunk.endLine,
-          embeddingStr
+          embeddingStr,
         );
       }
     } catch (err) {
@@ -77,16 +84,24 @@ async function processDelta(job: Job<DeltaJobData>): Promise<void> {
     data: { lastIndexedSha: newSha, status: "READY" },
   });
 
-  console.log(`[delta] Done: ${repo.fullName} — ${changedFiles.length} changed, ${removedFiles.length} removed`);
+  console.log(
+    `[delta] Done: ${repo.fullName} — ${changedFiles.length} changed, ${removedFiles.length} removed`,
+  );
 }
 
 export function createDeltaWorker() {
-  const worker = new Worker<DeltaJobData, void, "delta">("delta", processDelta, {
-    connection: redisConnection,
-    concurrency: 4,
-  });
+  const worker = new Worker<DeltaJobData, void, "delta">(
+    "delta",
+    processDelta,
+    {
+      connection: redisConnection,
+      concurrency: 4,
+    },
+  );
 
-  worker.on("completed", (job) => console.log(`[delta] Job ${job.id} completed`));
+  worker.on("completed", (job) =>
+    console.log(`[delta] Job ${job.id} completed`),
+  );
   worker.on("failed", async (job, err) => {
     console.error(`[delta] Job ${job?.id} failed:`, err.message);
     if (job?.data.repoId) {

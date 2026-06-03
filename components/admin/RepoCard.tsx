@@ -22,7 +22,19 @@ interface RepoCardProps {
   onSync: (id: string) => void;
 }
 
-const statusConfig: Record<IndexStatus, { label: string; variant: "default" | "secondary" | "destructive" | "success" | "warning" | "outline" }> = {
+const statusConfig: Record<
+  IndexStatus,
+  {
+    label: string;
+    variant:
+      | "default"
+      | "secondary"
+      | "destructive"
+      | "success"
+      | "warning"
+      | "outline";
+  }
+> = {
   PENDING: { label: "Pending", variant: "secondary" },
   INDEXING: { label: "Indexing…", variant: "warning" },
   READY: { label: "Ready", variant: "success" },
@@ -41,7 +53,8 @@ export function RepoCard({ repo, onDelete, onSync }: RepoCardProps) {
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Remove ${repo.fullName}? This will delete all indexed data.`)) return;
+    if (!confirm(`Remove ${repo.fullName}? This will delete all indexed data.`))
+      return;
     setDeleting(true);
     await onDelete(repo.id);
     setDeleting(false);
@@ -52,7 +65,9 @@ export function RepoCard({ repo, onDelete, onSync }: RepoCardProps) {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div>
-            <CardTitle className="text-base font-mono">{repo.fullName}</CardTitle>
+            <CardTitle className="text-base font-mono">
+              {repo.fullName}
+            </CardTitle>
             <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
               <GitBranch className="h-3 w-3" />
               <span>{repo.defaultBranch}</span>
@@ -81,7 +96,9 @@ export function RepoCard({ repo, onDelete, onSync }: RepoCardProps) {
             onClick={handleSync}
             disabled={syncing || repo.status === "INDEXING"}
           >
-            <RefreshCw className={`h-3.5 w-3.5 mr-1 ${syncing ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`h-3.5 w-3.5 mr-1 ${syncing ? "animate-spin" : ""}`}
+            />
             {syncing ? "Queued" : "Re-sync"}
           </Button>
           <Button

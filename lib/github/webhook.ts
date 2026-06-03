@@ -3,7 +3,7 @@ import crypto from "crypto";
 export function verifyWebhookSignature(
   payload: string,
   signature: string | null,
-  secret: string
+  secret: string,
 ): boolean {
   if (!signature) return false;
 
@@ -12,8 +12,5 @@ export function verifyWebhookSignature(
     .update(payload, "utf-8")
     .digest("hex")}`;
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expected)
-  );
+  return crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected));
 }

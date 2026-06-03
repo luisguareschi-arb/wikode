@@ -15,7 +15,10 @@ function isContiguous(a: SearchResult, b: SearchResult): boolean {
   return a.filePath === b.filePath && Math.abs(a.startLine - b.endLine) <= 20;
 }
 
-export function rerankChunks(chunks: SearchResult[], limit = 12): SearchResult[] {
+export function rerankChunks(
+  chunks: SearchResult[],
+  limit = 12,
+): SearchResult[] {
   if (chunks.length <= 1) return chunks.slice(0, limit);
 
   const grouped = new Map<string, SearchResult[]>();
@@ -32,12 +35,16 @@ export function rerankChunks(chunks: SearchResult[], limit = 12): SearchResult[]
   // Per file, keep the strongest match and contiguous neighbors.
   const reranked: SearchResult[] = [];
   for (const [, fileChunks] of grouped) {
-    const sortedBySimilarity = [...fileChunks].sort((a, b) => b.similarity - a.similarity);
+    const sortedBySimilarity = [...fileChunks].sort(
+      (a, b) => b.similarity - a.similarity,
+    );
     const best = sortedBySimilarity[0];
     reranked.push(best);
 
     const contiguous = fileChunks
-      .filter((chunk) => chunk.chunkId !== best.chunkId && isContiguous(best, chunk))
+      .filter(
+        (chunk) => chunk.chunkId !== best.chunkId && isContiguous(best, chunk),
+      )
       .sort((a, b) => b.similarity - a.similarity)
       .slice(0, 1);
 
@@ -50,7 +57,7 @@ export function rerankChunks(chunks: SearchResult[], limit = 12): SearchResult[]
 export async function searchChunks(
   queryEmbedding: number[],
   repoIds: string[],
-  limit = 20
+  limit = 20,
 ): Promise<SearchResult[]> {
   if (repoIds.length === 0) return [];
 
@@ -87,7 +94,7 @@ export async function searchChunks(
     `,
     embeddingStr,
     repoIds,
-    limit
+    limit,
   );
 
   const chunks = rows.map((r) => ({

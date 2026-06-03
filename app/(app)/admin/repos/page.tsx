@@ -22,7 +22,9 @@ function ReposContent() {
   const [repos, setRepos] = useState<Repo[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
-  const [cookieInstallationId, setCookieInstallationId] = useState<string | null>(null);
+  const [cookieInstallationId, setCookieInstallationId] = useState<
+    string | null
+  >(null);
   const searchParams = useSearchParams();
   const installationIdFromUrl = searchParams.get("installation_id");
   const installationId = installationIdFromUrl ?? cookieInstallationId;
@@ -52,7 +54,9 @@ function ReposContent() {
 
   // Poll while repos are actively indexing
   useEffect(() => {
-    const hasActive = repos.some((r) => r.status === "PENDING" || r.status === "INDEXING");
+    const hasActive = repos.some(
+      (r) => r.status === "PENDING" || r.status === "INDEXING",
+    );
     if (!hasActive) return;
     const interval = setInterval(loadRepos, 5000);
     return () => clearInterval(interval);
@@ -69,7 +73,9 @@ function ReposContent() {
   };
 
   const appSlug = process.env.NEXT_PUBLIC_GITHUB_APP_SLUG;
-  const connectUrl = appSlug ? `https://github.com/apps/${appSlug}/installations/new` : null;
+  const connectUrl = appSlug
+    ? `https://github.com/apps/${appSlug}/installations/new`
+    : null;
 
   return (
     <div className="p-8 max-w-4xl">
@@ -108,12 +114,19 @@ function ReposContent() {
       ) : repos.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
           <GitBranch className="h-10 w-10 text-gray-300 mb-3" />
-          <h3 className="text-sm font-medium text-gray-900">No repositories indexed</h3>
+          <h3 className="text-sm font-medium text-gray-900">
+            No repositories indexed
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
             Connect your GitHub App and add repositories to get started.
           </p>
           {connectUrl && (
-            <a href={connectUrl} target="_blank" rel="noreferrer" className="mt-4">
+            <a
+              href={connectUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4"
+            >
               <Button variant="outline" size="sm" className="gap-2">
                 <ExternalLink className="h-4 w-4" />
                 Connect GitHub App

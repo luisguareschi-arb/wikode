@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function DELETE(
   _req: NextRequest,
-  { params }: { params: Promise<{ repoId: string }> }
+  { params }: { params: Promise<{ repoId: string }> },
 ) {
   const session = await auth();
   // @ts-expect-error role is custom
@@ -20,7 +20,7 @@ export async function DELETE(
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ repoId: string }> }
+  { params }: { params: Promise<{ repoId: string }> },
 ) {
   const session = await auth();
   if (!session) {

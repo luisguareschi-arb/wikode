@@ -34,7 +34,7 @@ function parseRedisConnection(url: string): ConnectionOptions {
 
 // Plain connection config — no ioredis import, avoids bundled-vs-top-level version mismatch
 export const redisConnection = parseRedisConnection(
-  process.env.REDIS_URL ?? "redis://localhost:6379"
+  process.env.REDIS_URL ?? "redis://localhost:6379",
 );
 
 const queueDefaults = {

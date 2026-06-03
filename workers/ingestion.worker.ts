@@ -2,7 +2,11 @@ import { Worker, type Job } from "bullmq";
 import { prisma } from "@/lib/prisma";
 import { redisConnection, type IngestionJobData } from "@/lib/queue/index";
 import { getInstallationOctokit } from "@/lib/github/app";
-import { getRepoFileTree, getFileContent, detectLanguage } from "@/lib/github/files";
+import {
+  getRepoFileTree,
+  getFileContent,
+  detectLanguage,
+} from "@/lib/github/files";
 import { chunkFile } from "@/lib/embeddings/chunker";
 import { embedTexts } from "@/lib/embeddings/openai";
 
@@ -25,13 +29,26 @@ async function processIngestion(job: Job<IngestionJobData>): Promise<void> {
   let processed = 0;
   for (const file of files) {
     try {
-      const content = await getFileContent(octokit, owner, name, file.path, sha);
+      const content = await getFileContent(
+        octokit,
+        owner,
+        name,
+        file.path,
+        sha,
+      );
       const language = detectLanguage(file.path);
 
       // Upsert the RepoFile record
       const repoFile = await prisma.repoFile.upsert({
-        where: { repositoryId_filePath: { repositoryId: repoId, filePath: file.path } },
-        create: { repositoryId: repoId, filePath: file.path, language, sha: file.sha },
+        where: {
+          repositoryId_filePath: { repositoryId: repoId, filePath: file.path },
+        },
+        create: {
+          repositoryId: repoId,
+          filePath: file.path,
+          language,
+          sha: file.sha,
+        },
         update: { sha: file.sha, language },
       });
 
@@ -56,7 +73,7 @@ async function processIngestion(job: Job<IngestionJobData>): Promise<void> {
           chunk.content,
           chunk.startLine,
           chunk.endLine,
-          embeddingStr
+          embeddingStr,
         );
       }
 
@@ -73,7 +90,9 @@ async function processIngestion(job: Job<IngestionJobData>): Promise<void> {
     data: { status: "READY", lastIndexedSha: sha },
   });
 
-  console.log(`[ingestion] Done: ${owner}/${name} — indexed ${processed}/${files.length} files`);
+  console.log(
+    `[ingestion] Done: ${owner}/${name} — indexed ${processed}/${files.length} files`,
+  );
 }
 
 export function createIngestionWorker() {
@@ -83,7 +102,7 @@ export function createIngestionWorker() {
     {
       connection: redisConnection,
       concurrency: 2,
-    }
+    },
   );
 
   worker.on("completed", (job) => {

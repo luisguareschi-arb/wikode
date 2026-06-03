@@ -13,7 +13,10 @@ import {
   Trash2,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
-import { groupThreadsByDate, type ThreadListItem } from "@/lib/chat/group-threads";
+import {
+  groupThreadsByDate,
+  type ThreadListItem,
+} from "@/lib/chat/group-threads";
 import { cn } from "@/lib/utils";
 
 interface AppSidebarProps {
@@ -49,7 +52,8 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
   useEffect(() => {
     const onThreadsChanged = () => void loadThreads();
     window.addEventListener("wikode:threads-changed", onThreadsChanged);
-    return () => window.removeEventListener("wikode:threads-changed", onThreadsChanged);
+    return () =>
+      window.removeEventListener("wikode:threads-changed", onThreadsChanged);
   }, [loadThreads]);
 
   const deleteThread = async (threadId: string, event: React.MouseEvent) => {
@@ -68,7 +72,9 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
   return (
     <aside className="flex w-[260px] shrink-0 flex-col border-r border-[hsl(var(--border))] bg-[hsl(var(--app-sidebar))]">
       <div className="px-3 pb-4 pt-3">
-        <span className="text-sm font-semibold text-[hsl(var(--app-text))]">Wikode</span>
+        <span className="text-sm font-semibold text-[hsl(var(--app-text))]">
+          Wikode
+        </span>
       </div>
 
       <nav className="space-y-0.5 px-2 pb-2">
@@ -76,10 +82,13 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
           href="/chat"
           className={cn(
             "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] text-[hsl(var(--app-text))] transition-colors hover:bg-black/4",
-            isNewChat && "bg-[hsl(var(--app-active))] font-medium"
+            isNewChat && "bg-[hsl(var(--app-active))] font-medium",
           )}
         >
-          <SquarePen className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]" strokeWidth={1.75} />
+          <SquarePen
+            className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]"
+            strokeWidth={1.75}
+          />
           New chat
         </Link>
         {isAdmin ? (
@@ -87,10 +96,14 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
             href="/admin"
             className={cn(
               "flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-[13px] text-[hsl(var(--app-text))] transition-colors hover:bg-black/4",
-              pathname.startsWith("/admin") && "bg-[hsl(var(--app-active))] font-medium"
+              pathname.startsWith("/admin") &&
+                "bg-[hsl(var(--app-active))] font-medium",
             )}
           >
-            <Settings className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]" strokeWidth={1.75} />
+            <Settings
+              className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]"
+              strokeWidth={1.75}
+            />
             Admin
           </Link>
         ) : null}
@@ -103,7 +116,9 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
             Loading…
           </div>
         ) : threadGroups.length === 0 ? (
-          <p className="px-2.5 py-4 text-xs text-[hsl(var(--app-text-muted))]">No conversations yet.</p>
+          <p className="px-2.5 py-4 text-xs text-[hsl(var(--app-text-muted))]">
+            No conversations yet.
+          </p>
         ) : (
           <div className="space-y-3">
             {threadGroups.map((group) => (
@@ -120,10 +135,14 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
                           href={`/chat/${thread.id}`}
                           className={cn(
                             "group flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-[13px] text-[hsl(var(--app-text))] transition-colors hover:bg-black/4",
-                            isActive && "bg-[hsl(var(--app-active))] font-medium"
+                            isActive &&
+                              "bg-[hsl(var(--app-active))] font-medium",
                           )}
                         >
-                          <MessageSquare className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--app-text-muted))]" strokeWidth={1.75} />
+                          <MessageSquare
+                            className="h-3.5 w-3.5 shrink-0 text-[hsl(var(--app-text-muted))]"
+                            strokeWidth={1.75}
+                          />
                           <span className="min-w-0 flex-1 truncate">
                             {thread.title?.trim() || "Untitled"}
                           </span>
@@ -131,9 +150,14 @@ export function AppSidebar({ isAdmin, user }: AppSidebarProps) {
                             type="button"
                             className="shrink-0 rounded p-0.5 text-[hsl(var(--app-text-muted))] opacity-0 transition-opacity hover:text-red-600 group-hover:opacity-100"
                             aria-label="Delete conversation"
-                            onClick={(event) => void deleteThread(thread.id, event)}
+                            onClick={(event) =>
+                              void deleteThread(thread.id, event)
+                            }
                           >
-                            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.75} />
+                            <Trash2
+                              className="h-3.5 w-3.5"
+                              strokeWidth={1.75}
+                            />
                           </button>
                         </Link>
                       </li>

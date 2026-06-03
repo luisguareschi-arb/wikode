@@ -17,7 +17,7 @@ const OVERLAP_CHARS = CHUNK_OVERLAP_TOKENS * CHARS_PER_TOKEN;
 export function chunkFile(
   content: string,
   filePath: string,
-  language: string
+  language: string,
 ): Chunk[] {
   const lines = content.split("\n");
 
@@ -31,7 +31,7 @@ export function chunkFile(
 function chunkMarkdown(
   lines: string[],
   filePath: string,
-  language: string
+  language: string,
 ): Chunk[] {
   const chunks: Chunk[] = [];
   let currentLines: string[] = [];
@@ -44,7 +44,13 @@ function chunkMarkdown(
     if (isHeading && currentLines.length > 0) {
       const content = currentLines.join("\n").trim();
       if (content) {
-        chunks.push({ content, startLine, endLine: startLine + currentLines.length - 1, filePath, language });
+        chunks.push({
+          content,
+          startLine,
+          endLine: startLine + currentLines.length - 1,
+          filePath,
+          language,
+        });
       }
       startLine = i + 1;
       currentLines = [line];
@@ -68,7 +74,13 @@ function chunkMarkdown(
   if (currentLines.length > 0) {
     const content = currentLines.join("\n").trim();
     if (content) {
-      chunks.push({ content, startLine, endLine: lines.length, filePath, language });
+      chunks.push({
+        content,
+        startLine,
+        endLine: lines.length,
+        filePath,
+        language,
+      });
     }
   }
 
@@ -78,7 +90,7 @@ function chunkMarkdown(
 function chunkCode(
   lines: string[],
   filePath: string,
-  language: string
+  language: string,
 ): Chunk[] {
   const chunks: Chunk[] = [];
   let startLine = 1;
@@ -89,7 +101,10 @@ function chunkCode(
     currentChars += lines[i].length + 1;
 
     if (currentChars >= CHUNK_SIZE_CHARS) {
-      const content = lines.slice(chunkStartIdx, i + 1).join("\n").trim();
+      const content = lines
+        .slice(chunkStartIdx, i + 1)
+        .join("\n")
+        .trim();
       if (content) {
         chunks.push({ content, startLine, endLine: i + 1, filePath, language });
       }
@@ -104,7 +119,9 @@ function chunkCode(
 
       chunkStartIdx = overlapStart + 1;
       startLine = chunkStartIdx + 1;
-      currentChars = lines.slice(chunkStartIdx, i + 1).reduce((acc, l) => acc + l.length + 1, 0);
+      currentChars = lines
+        .slice(chunkStartIdx, i + 1)
+        .reduce((acc, l) => acc + l.length + 1, 0);
     }
   }
 
@@ -112,7 +129,13 @@ function chunkCode(
   if (chunkStartIdx < lines.length) {
     const content = lines.slice(chunkStartIdx).join("\n").trim();
     if (content) {
-      chunks.push({ content, startLine, endLine: lines.length, filePath, language });
+      chunks.push({
+        content,
+        startLine,
+        endLine: lines.length,
+        filePath,
+        language,
+      });
     }
   }
 

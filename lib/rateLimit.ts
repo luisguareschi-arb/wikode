@@ -1,6 +1,10 @@
 const windowBuckets = new Map<string, number[]>();
 
-export function checkRateLimit(key: string, limit: number, windowMs: number): boolean {
+export function checkRateLimit(
+  key: string,
+  limit: number,
+  windowMs: number,
+): boolean {
   const now = Date.now();
   const windowStart = now - windowMs;
   const current = windowBuckets.get(key) ?? [];

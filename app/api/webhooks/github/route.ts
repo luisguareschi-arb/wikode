@@ -40,7 +40,9 @@ export async function POST(req: NextRequest) {
     removedFiles.push(...(commit.removed ?? []));
   }
 
-  const uniqueChanged = [...new Set(changedFiles)].filter((f) => !removedFiles.includes(f));
+  const uniqueChanged = [...new Set(changedFiles)].filter(
+    (f) => !removedFiles.includes(f),
+  );
   const uniqueRemoved = [...new Set(removedFiles)];
 
   if (uniqueChanged.length > 0 || uniqueRemoved.length > 0) {

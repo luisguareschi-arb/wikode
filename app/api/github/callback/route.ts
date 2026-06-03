@@ -18,18 +18,27 @@ export async function GET(req: NextRequest) {
   const setupAction = req.nextUrl.searchParams.get("setup_action");
 
   if (!installationId) {
-    return NextResponse.redirect(new URL("/admin?error=no_installation_id", req.url));
+    return NextResponse.redirect(
+      new URL("/admin?error=no_installation_id", req.url),
+    );
   }
 
   // Verify the installation is accessible
   try {
     await getInstallationOctokit(parseInt(installationId, 10));
   } catch {
-    return NextResponse.redirect(new URL("/admin?error=invalid_installation", req.url));
+    return NextResponse.redirect(
+      new URL("/admin?error=invalid_installation", req.url),
+    );
   }
 
   // Store the installation ID in a cookie for use in the admin UI
-  const response = NextResponse.redirect(new URL(`/admin/repos?installation_id=${installationId}&setup_action=${setupAction ?? "install"}`, req.url));
+  const response = NextResponse.redirect(
+    new URL(
+      `/admin/repos?installation_id=${installationId}&setup_action=${setupAction ?? "install"}`,
+      req.url,
+    ),
+  );
   response.cookies.set("gh_installation_id", installationId, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",

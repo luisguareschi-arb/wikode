@@ -11,19 +11,25 @@ interface ChatHeaderProps {
   className?: string;
 }
 
-export function ChatHeader({ title, repoIds, onRepoIdsChange, className }: ChatHeaderProps) {
+export function ChatHeader({
+  title,
+  repoIds,
+  onRepoIdsChange,
+  className,
+}: ChatHeaderProps) {
   return (
     <header
-      className={cn(
-        "flex shrink-0 items-center gap-3 px-4 py-2.5",
-        className
-      )}
+      className={cn("flex shrink-0 items-center gap-3 px-4 py-2.5", className)}
     >
       <h1 className="min-w-0 truncate text-sm font-normal text-[hsl(var(--app-text))]">
         {title || "New conversation"}
       </h1>
       <div className="flex min-w-0 shrink items-center gap-1.5 text-[hsl(var(--app-text-muted))]">
-        <Folder className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} aria-hidden />
+        <Folder
+          className="h-3.5 w-3.5 shrink-0"
+          strokeWidth={1.75}
+          aria-hidden
+        />
         <RepoBranchPicker
           variant="header"
           selectedRepoIds={repoIds}

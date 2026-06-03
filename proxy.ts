@@ -6,7 +6,11 @@ export default auth((req) => {
   const session = req.auth;
 
   // Not signed in → redirect to login (except login page and api/auth)
-  if (!session && !pathname.startsWith("/login") && !pathname.startsWith("/api/auth")) {
+  if (
+    !session &&
+    !pathname.startsWith("/login") &&
+    !pathname.startsWith("/api/auth")
+  ) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

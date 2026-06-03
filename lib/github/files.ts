@@ -1,16 +1,33 @@
 import { Octokit } from "@octokit/rest";
 
 const INCLUDED_EXTENSIONS = new Set([
-  ".ts", ".tsx", ".js", ".jsx",
-  ".py", ".go", ".rs", ".java",
-  ".rb", ".php", ".cs", ".cpp",
-  ".c", ".md",
+  ".ts",
+  ".tsx",
+  ".js",
+  ".jsx",
+  ".py",
+  ".go",
+  ".rs",
+  ".java",
+  ".rb",
+  ".php",
+  ".cs",
+  ".cpp",
+  ".c",
+  ".md",
 ]);
 
 const EXCLUDED_DIRS = new Set([
-  "node_modules", ".git", "dist", "build",
-  ".next", "coverage", "__pycache__", "vendor",
-  ".cache", "tmp",
+  "node_modules",
+  ".git",
+  "dist",
+  "build",
+  ".next",
+  "coverage",
+  "__pycache__",
+  "vendor",
+  ".cache",
+  "tmp",
 ]);
 
 const EXCLUDED_PATTERNS = [
@@ -53,7 +70,7 @@ export async function getRepoFileTree(
   octokit: Octokit,
   owner: string,
   repo: string,
-  treeSha: string
+  treeSha: string,
 ): Promise<FileEntry[]> {
   const { data } = await octokit.rest.git.getTree({
     owner,
@@ -79,7 +96,7 @@ export async function getFileContent(
   owner: string,
   repo: string,
   filePath: string,
-  ref: string
+  ref: string,
 ): Promise<string> {
   const blob = await getFileBlob(octokit, owner, repo, filePath, ref);
   return blob.content;
@@ -90,7 +107,7 @@ export async function getFileBlob(
   owner: string,
   repo: string,
   filePath: string,
-  ref: string
+  ref: string,
 ): Promise<{ content: string; sha: string }> {
   const { data } = await octokit.rest.repos.getContent({
     owner,

@@ -9,7 +9,7 @@ const UpdateRoleSchema = z.object({
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   const session = await auth();
   // @ts-expect-error role is custom
@@ -20,7 +20,10 @@ export async function PATCH(
   const body = await req.json();
   const parsed = UpdateRoleSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
   const { userId } = await params;
@@ -31,11 +34,17 @@ export async function PATCH(
 
   if (targetUser.role === "ADMIN" && parsed.data.role !== "ADMIN") {
     if (session.user.id === userId) {
-      return NextResponse.json({ error: "You cannot demote your own admin account." }, { status: 400 });
+      return NextResponse.json(
+        { error: "You cannot demote your own admin account." },
+        { status: 400 },
+      );
     }
     const adminCount = await prisma.user.count({ where: { role: "ADMIN" } });
     if (adminCount <= 1) {
-      return NextResponse.json({ error: "Cannot demote the last admin." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Cannot demote the last admin." },
+        { status: 400 },
+      );
     }
   }
 

@@ -52,13 +52,17 @@ export function RepoBranchPicker({
   }, []);
 
   useEffect(() => {
-    if (readOnly || loading || repos.length === 0 || selectedRepoIds.length > 0) return;
+    if (readOnly || loading || repos.length === 0 || selectedRepoIds.length > 0)
+      return;
     onChange([repos[0].id]);
   }, [readOnly, loading, repos, selectedRepoIds.length, onChange]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setRepoOpen(false);
         setBranchOpen(false);
       }
@@ -72,7 +76,12 @@ export function RepoBranchPicker({
 
   if (loading) {
     return (
-      <div className={cn("flex items-center gap-1.5 text-[hsl(var(--app-text-muted))]", className)}>
+      <div
+        className={cn(
+          "flex items-center gap-1.5 text-[hsl(var(--app-text-muted))]",
+          className,
+        )}
+      >
         <Loader2 className="h-3 w-3 animate-spin" />
         {variant === "header" ? (
           <span className="text-[13px]">Loading…</span>
@@ -89,7 +98,7 @@ export function RepoBranchPicker({
         className={cn(
           variant === "header" ? "text-[13px]" : "text-sm",
           "text-[hsl(var(--app-text-muted))]",
-          className
+          className,
         )}
       >
         {variant === "header"
@@ -101,14 +110,16 @@ export function RepoBranchPicker({
 
   const repoLabel =
     variant === "header"
-      ? selectedRepo?.fullName ?? "Select repository"
+      ? (selectedRepo?.fullName ?? "Select repository")
       : selectedRepo
         ? repoShortName(selectedRepo.fullName)
         : "Select repository";
 
   if (variant === "header") {
     const repoContent = (
-      <span className="max-w-[180px] truncate font-mono text-[13px] sm:max-w-xs">{repoLabel}</span>
+      <span className="max-w-[180px] truncate font-mono text-[13px] sm:max-w-xs">
+        {repoLabel}
+      </span>
     );
 
     return (
@@ -136,7 +147,8 @@ export function RepoBranchPicker({
                 }}
                 className={cn(
                   "block w-full px-3 py-2 text-left text-[13px] hover:bg-black/4",
-                  repo.id === selectedRepoIds[0] && "bg-[hsl(var(--app-active))] font-medium"
+                  repo.id === selectedRepoIds[0] &&
+                    "bg-[hsl(var(--app-active))] font-medium",
                 )}
               >
                 {repo.fullName}
@@ -149,7 +161,10 @@ export function RepoBranchPicker({
   }
 
   return (
-    <div ref={containerRef} className={cn("flex flex-wrap items-center gap-1", className)}>
+    <div
+      ref={containerRef}
+      className={cn("flex flex-wrap items-center gap-1", className)}
+    >
       <div className="relative">
         <button
           type="button"
@@ -161,11 +176,13 @@ export function RepoBranchPicker({
           }}
           className={cn(
             "inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-[hsl(var(--app-text))]",
-            !readOnly && "hover:bg-black/4"
+            !readOnly && "hover:bg-black/4",
           )}
         >
           {repoLabel}
-          {!readOnly && <ChevronDown className="h-3.5 w-3.5 text-[hsl(var(--app-text-muted))]" />}
+          {!readOnly && (
+            <ChevronDown className="h-3.5 w-3.5 text-[hsl(var(--app-text-muted))]" />
+          )}
         </button>
         {repoOpen && (
           <div className="absolute left-0 top-full z-20 mt-1 min-w-[220px] rounded-lg border border-[hsl(var(--border))] bg-white py-1 shadow-lg">
@@ -179,7 +196,8 @@ export function RepoBranchPicker({
                 }}
                 className={cn(
                   "block w-full px-3 py-2 text-left text-[13px] hover:bg-black/4",
-                  repo.id === selectedRepoIds[0] && "bg-[hsl(var(--app-active))] font-medium"
+                  repo.id === selectedRepoIds[0] &&
+                    "bg-[hsl(var(--app-active))] font-medium",
                 )}
               >
                 {repo.fullName}
@@ -200,11 +218,13 @@ export function RepoBranchPicker({
           }}
           className={cn(
             "inline-flex items-center gap-1 rounded-md px-2 py-1 text-sm font-medium text-[hsl(var(--app-text))]",
-            !readOnly && selectedRepo && "hover:bg-black/4"
+            !readOnly && selectedRepo && "hover:bg-black/4",
           )}
         >
           {selectedBranch}
-          {!readOnly && selectedRepo && <ChevronDown className="h-3.5 w-3.5 text-[hsl(var(--app-text-muted))]" />}
+          {!readOnly && selectedRepo && (
+            <ChevronDown className="h-3.5 w-3.5 text-[hsl(var(--app-text-muted))]" />
+          )}
         </button>
         {branchOpen && selectedRepo && (
           <div className="absolute left-0 top-full z-20 mt-1 min-w-[140px] rounded-lg border border-[hsl(var(--border))] bg-white py-1 shadow-lg">

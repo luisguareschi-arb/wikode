@@ -5,7 +5,10 @@ let _app: App | null = null;
 
 function getApp(): App {
   if (!_app) {
-    const privateKey = process.env.GITHUB_APP_PRIVATE_KEY!.replace(/\\n/g, "\n");
+    const privateKey = process.env.GITHUB_APP_PRIVATE_KEY!.replace(
+      /\\n/g,
+      "\n",
+    );
     _app = new App({
       appId: process.env.GITHUB_APP_ID!,
       privateKey,
@@ -24,7 +27,9 @@ function getApp(): App {
  * Returns a fresh Octokit instance authenticated as the installation.
  * Never cached — installation tokens expire after 1 hour.
  */
-export async function getInstallationOctokit(installationId: number): Promise<Octokit> {
+export async function getInstallationOctokit(
+  installationId: number,
+): Promise<Octokit> {
   const app = getApp();
   return app.getInstallationOctokit(installationId) as Promise<Octokit>;
 }

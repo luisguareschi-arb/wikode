@@ -1,7 +1,14 @@
 import { cn } from "@/lib/utils";
 
 function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded bg-[hsl(var(--app-active))]", className)} />;
+  return (
+    <div
+      className={cn(
+        "animate-pulse rounded bg-[hsl(var(--app-active))]",
+        className,
+      )}
+    />
+  );
 }
 
 function ComposerSkeleton({ mode }: { mode: "empty" | "follow-up" }) {
@@ -17,13 +24,15 @@ function ComposerSkeleton({ mode }: { mode: "empty" | "follow-up" }) {
       <div
         className={cn(
           "rounded-xl border border-[hsl(var(--border))] bg-white",
-          !isEmpty && "relative"
+          !isEmpty && "relative",
         )}
       >
         <div
           className={cn(
             "px-4",
-            isEmpty ? "min-h-[100px] pb-2 pt-4" : "min-h-[72px] py-3 pr-12 pb-10"
+            isEmpty
+              ? "min-h-[100px] pb-2 pt-4"
+              : "min-h-[72px] py-3 pr-12 pb-10",
           )}
         >
           <Skeleton className={cn("h-3.5", isEmpty ? "w-2/3" : "w-28")} />

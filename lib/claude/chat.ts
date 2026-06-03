@@ -36,7 +36,7 @@ function buildContextBlock(chunks: SearchResult[]): string {
   const lines = ["=== RETRIEVED CONTEXT ==="];
   for (const chunk of chunks) {
     lines.push(
-      `[repo: ${chunk.repoFullName} | file: ${chunk.filePath} | lines: ${chunk.startLine}-${chunk.endLine}]`
+      `[repo: ${chunk.repoFullName} | file: ${chunk.filePath} | lines: ${chunk.startLine}-${chunk.endLine}]`,
     );
     lines.push(chunk.content);
     lines.push("");
@@ -49,7 +49,7 @@ export function streamChat(
   userMessage: string,
   history: ChatMessage[],
   context: SearchResult[],
-  onFinish?: (text: string) => void | Promise<void>
+  onFinish?: (text: string) => void | Promise<void>,
 ) {
   const contextBlock = buildContextBlock(context);
   const systemWithContext = contextBlock
@@ -60,7 +60,10 @@ export function streamChat(
     model: anthropic("claude-sonnet-4-6"),
     system: systemWithContext,
     messages: [
-      ...trimHistory(history).map((m) => ({ role: m.role, content: m.content })),
+      ...trimHistory(history).map((m) => ({
+        role: m.role,
+        content: m.content,
+      })),
       { role: "user" as const, content: userMessage },
     ],
     maxTokens: 4096,
@@ -75,7 +78,7 @@ export function streamChat(
 
 export function trimHistory(
   history: ChatMessage[],
-  tokenBudget = HISTORY_TOKEN_BUDGET
+  tokenBudget = HISTORY_TOKEN_BUDGET,
 ): ChatMessage[] {
   if (history.length === 0) return [];
 
@@ -93,10 +96,11 @@ export function trimHistory(
 }
 
 export function extractCitations(
-  text: string
+  text: string,
 ): { filePath: string; startLine: number; endLine: number }[] {
   const pattern = /\[([^\]]+):(\d+)-(\d+)\]/g;
-  const citations: { filePath: string; startLine: number; endLine: number }[] = [];
+  const citations: { filePath: string; startLine: number; endLine: number }[] =
+    [];
   let match;
 
   while ((match = pattern.exec(text)) !== null) {
@@ -113,12 +117,14 @@ export function extractCitations(
 export function citationsWithContext(
   text: string,
   chunks: SearchResult[],
-  repos: RepoCitationContext[]
+  repos: RepoCitationContext[],
 ): CitationWithContext[] {
   const extracted = extractCitations(text);
   if (extracted.length === 0) return [];
 
-  const defaultBranchByRepo = new Map(repos.map((repo) => [repo.fullName, repo.defaultBranch]));
+  const defaultBranchByRepo = new Map(
+    repos.map((repo) => [repo.fullName, repo.defaultBranch]),
+  );
 
   const withContext: CitationWithContext[] = [];
   for (const citation of extracted) {
@@ -126,7 +132,7 @@ export function citationsWithContext(
       (chunk) =>
         chunk.filePath === citation.filePath &&
         chunk.startLine <= citation.startLine &&
-        chunk.endLine >= citation.endLine
+        chunk.endLine >= citation.endLine,
     );
 
     if (!match) continue;

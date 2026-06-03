@@ -3,7 +3,10 @@
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Highlight, type Language, themes } from "prism-react-renderer";
-import { CitationCard, type CitationData } from "@/components/chat/CitationCard";
+import {
+  CitationCard,
+  type CitationData,
+} from "@/components/chat/CitationCard";
 import { cn } from "@/lib/utils";
 
 export interface ChatMessageItem {
@@ -32,16 +35,24 @@ function parseInlineCitations(text: string): CitationData[] {
 
 const markdownComponents: Components = {
   h1: ({ children }) => (
-    <h2 className="mb-3 mt-1 text-base font-semibold text-[hsl(var(--app-text))]">{children}</h2>
+    <h2 className="mb-3 mt-1 text-base font-semibold text-[hsl(var(--app-text))]">
+      {children}
+    </h2>
   ),
   h2: ({ children }) => (
-    <h3 className="mb-2 mt-1 text-[15px] font-semibold text-[hsl(var(--app-text))]">{children}</h3>
+    <h3 className="mb-2 mt-1 text-[15px] font-semibold text-[hsl(var(--app-text))]">
+      {children}
+    </h3>
   ),
   h3: ({ children }) => (
-    <h4 className="mb-1.5 mt-1 text-[14px] font-semibold text-[hsl(var(--app-text))]">{children}</h4>
+    <h4 className="mb-1.5 mt-1 text-[14px] font-semibold text-[hsl(var(--app-text))]">
+      {children}
+    </h4>
   ),
   p: ({ children }) => (
-    <p className="mb-3 text-[14px] leading-[1.6] text-[hsl(var(--app-text))] last:mb-0">{children}</p>
+    <p className="mb-3 text-[14px] leading-[1.6] text-[hsl(var(--app-text))] last:mb-0">
+      {children}
+    </p>
   ),
   ul: ({ children }) => (
     <ul className="mb-3 list-disc space-y-1.5 pl-5 text-[14px] leading-[1.6] text-[hsl(var(--app-text))]">
@@ -55,9 +66,13 @@ const markdownComponents: Components = {
   ),
   li: ({ children }) => <li className="leading-[1.6]">{children}</li>,
   strong: ({ children }) => (
-    <strong className="font-semibold text-[hsl(var(--app-text))]">{children}</strong>
+    <strong className="font-semibold text-[hsl(var(--app-text))]">
+      {children}
+    </strong>
   ),
-  em: ({ children }) => <em className="text-[hsl(var(--app-text))]">{children}</em>,
+  em: ({ children }) => (
+    <em className="text-[hsl(var(--app-text))]">{children}</em>
+  ),
   a: ({ children, href }) => (
     <a
       href={href}
@@ -108,7 +123,11 @@ const markdownComponents: Components = {
             <div className="px-3 py-2.5">
               {tokens.map((line, i) => {
                 const lineProps = getLineProps({ line, key: i });
-                const { key: lineKey, className: lpClassName, ...restLineProps } = lineProps as {
+                const {
+                  key: lineKey,
+                  className: lpClassName,
+                  ...restLineProps
+                } = lineProps as {
                   key?: React.Key;
                   className?: string;
                 };
@@ -119,9 +138,18 @@ const markdownComponents: Components = {
                     className={`${lpClassName ?? ""} whitespace-pre`}
                   >
                     {line.map((token, tokenIndex) => {
-                      const tokenProps = getTokenProps({ token, key: tokenIndex });
-                      const { key: tokenKey, ...restTokenProps } = tokenProps as { key?: React.Key };
-                      return <span key={tokenKey ?? tokenIndex} {...restTokenProps} />;
+                      const tokenProps = getTokenProps({
+                        token,
+                        key: tokenIndex,
+                      });
+                      const { key: tokenKey, ...restTokenProps } =
+                        tokenProps as { key?: React.Key };
+                      return (
+                        <span
+                          key={tokenKey ?? tokenIndex}
+                          {...restTokenProps}
+                        />
+                      );
                     })}
                   </div>
                 );
@@ -143,16 +171,20 @@ const markdownComponents: Components = {
 export function MessageBubble({ message }: { message: ChatMessageItem }) {
   const parsedCitations = parseInlineCitations(message.content);
   const citations =
-    message.citations && message.citations.length > 0 ? message.citations : parsedCitations;
+    message.citations && message.citations.length > 0
+      ? message.citations
+      : parsedCitations;
   const isUser = message.role === "user";
 
-  const displayContent = (message.content || "").replace(citationPattern, "").trim();
+  const displayContent = (message.content || "")
+    .replace(citationPattern, "")
+    .trim();
   const effectiveContent = displayContent || (!isUser ? "Thinking…" : "");
 
   if (isUser) {
     return (
       <div className="w-full sticky top-0">
-        <div className="inline-block w-full max-w-full rounded-lg border border-[hsl(var(--border))] bg-white px-4 py-3">
+        <div className="inline-block w-full max-w-full rounded-lg border border-[hsl(var(--border))] bg-white px-3 py-2">
           <p className="whitespace-pre-wrap text-[14px] leading-[1.6] text-[hsl(var(--app-text))]">
             {effectiveContent}
           </p>
@@ -163,8 +195,16 @@ export function MessageBubble({ message }: { message: ChatMessageItem }) {
 
   return (
     <div className="w-full py-1 px-3">
-      <div className={cn("max-w-none", !effectiveContent && "text-[hsl(var(--app-text-muted))]")}>
-        <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
+      <div
+        className={cn(
+          "max-w-none",
+          !effectiveContent && "text-[hsl(var(--app-text-muted))]",
+        )}
+      >
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          components={markdownComponents}
+        >
           {effectiveContent}
         </ReactMarkdown>
       </div>

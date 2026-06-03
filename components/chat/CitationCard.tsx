@@ -46,7 +46,13 @@ function languageFromFilePath(filePath: string): Language {
   return byExtension[ext ?? ""] ?? "typescript";
 }
 
-function CitationCodeBlock({ code, filePath }: { code: string; filePath: string }) {
+function CitationCodeBlock({
+  code,
+  filePath,
+}: {
+  code: string;
+  filePath: string;
+}) {
   const language = languageFromFilePath(filePath);
 
   return (
@@ -55,7 +61,11 @@ function CitationCodeBlock({ code, filePath }: { code: string; filePath: string 
         <div className="overflow-x-auto px-3 py-2 font-mono text-[12px] leading-relaxed">
           {tokens.map((line, lineIndex) => {
             const lineProps = getLineProps({ line, key: lineIndex });
-            const { key: lineKey, className, ...restLineProps } = lineProps as {
+            const {
+              key: lineKey,
+              className,
+              ...restLineProps
+            } = lineProps as {
               key?: React.Key;
               className?: string;
             };
@@ -67,8 +77,12 @@ function CitationCodeBlock({ code, filePath }: { code: string; filePath: string 
               >
                 {line.map((token, tokenIndex) => {
                   const tokenProps = getTokenProps({ token, key: tokenIndex });
-                  const { key: tokenKey, ...restTokenProps } = tokenProps as { key?: React.Key };
-                  return <span key={tokenKey ?? tokenIndex} {...restTokenProps} />;
+                  const { key: tokenKey, ...restTokenProps } = tokenProps as {
+                    key?: React.Key;
+                  };
+                  return (
+                    <span key={tokenKey ?? tokenIndex} {...restTokenProps} />
+                  );
                 })}
               </div>
             );
@@ -96,9 +110,17 @@ export function CitationCard({ citation }: { citation: CitationData }) {
   return (
     <div className="mt-2 overflow-hidden rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--app-code-bg))]">
       <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] px-3 py-2">
-        <FileCode2 className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]" strokeWidth={1.75} aria-hidden />
-        <span className="truncate text-[13px] font-medium text-[hsl(var(--app-text))]">{fileName}</span>
-        <span className="shrink-0 text-[13px] text-[hsl(var(--app-text-muted))]">{lineLabel}</span>
+        <FileCode2
+          className="h-4 w-4 shrink-0 text-[hsl(var(--app-text-muted))]"
+          strokeWidth={1.75}
+          aria-hidden
+        />
+        <span className="truncate text-[13px] font-medium text-[hsl(var(--app-text))]">
+          {fileName}
+        </span>
+        <span className="shrink-0 text-[13px] text-[hsl(var(--app-text-muted))]">
+          {lineLabel}
+        </span>
         {githubUrl ? (
           <a
             href={githubUrl}
@@ -111,7 +133,12 @@ export function CitationCard({ citation }: { citation: CitationData }) {
           </a>
         ) : null}
       </div>
-      {citation.content ? <CitationCodeBlock code={citation.content} filePath={citation.filePath} /> : null}
+      {citation.content ? (
+        <CitationCodeBlock
+          code={citation.content}
+          filePath={citation.filePath}
+        />
+      ) : null}
     </div>
   );
 }

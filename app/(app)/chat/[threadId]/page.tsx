@@ -5,23 +5,34 @@ import { prisma } from "@/lib/prisma";
 import { ChatWindow } from "@/components/chat/ChatWindow";
 import type { CitationData } from "@/components/chat/CitationCard";
 
-function normalizeCitations(value: Prisma.JsonValue | null): CitationData[] | undefined {
+function normalizeCitations(
+  value: Prisma.JsonValue | null,
+): CitationData[] | undefined {
   if (!Array.isArray(value)) return undefined;
   const results: CitationData[] = [];
   for (const item of value as Prisma.JsonArray) {
     if (typeof item !== "object" || item === null) continue;
     const citation = item as Record<string, unknown>;
-    const filePath = typeof citation.filePath === "string" ? citation.filePath : "";
-    const startLine = typeof citation.startLine === "number" ? citation.startLine : 0;
+    const filePath =
+      typeof citation.filePath === "string" ? citation.filePath : "";
+    const startLine =
+      typeof citation.startLine === "number" ? citation.startLine : 0;
     const endLine = typeof citation.endLine === "number" ? citation.endLine : 0;
     if (!filePath || startLine <= 0 || endLine <= 0) continue;
     results.push({
       filePath,
       startLine,
       endLine,
-      repoFullName: typeof citation.repoFullName === "string" ? citation.repoFullName : undefined,
-      defaultBranch: typeof citation.defaultBranch === "string" ? citation.defaultBranch : undefined,
-      content: typeof citation.content === "string" ? citation.content : undefined,
+      repoFullName:
+        typeof citation.repoFullName === "string"
+          ? citation.repoFullName
+          : undefined,
+      defaultBranch:
+        typeof citation.defaultBranch === "string"
+          ? citation.defaultBranch
+          : undefined,
+      content:
+        typeof citation.content === "string" ? citation.content : undefined,
     });
   }
   return results.length > 0 ? results : undefined;

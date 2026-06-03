@@ -24,15 +24,24 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const parsed = AddRepoSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
+    return NextResponse.json(
+      { error: parsed.error.flatten() },
+      { status: 400 },
+    );
   }
 
-  const { githubRepoId, installationId, owner, name, fullName, defaultBranch } = parsed.data;
+  const { githubRepoId, installationId, owner, name, fullName, defaultBranch } =
+    parsed.data;
 
   // Check if already indexed
-  const existing = await prisma.repository.findUnique({ where: { githubRepoId } });
+  const existing = await prisma.repository.findUnique({
+    where: { githubRepoId },
+  });
   if (existing) {
-    return NextResponse.json({ error: "Repository already added" }, { status: 409 });
+    return NextResponse.json(
+      { error: "Repository already added" },
+      { status: 409 },
+    );
   }
 
   // Get the current HEAD sha
@@ -45,7 +54,15 @@ export async function POST(req: NextRequest) {
   const sha = ref.object.sha;
 
   const repo = await prisma.repository.create({
-    data: { githubRepoId, installationId, owner, name, fullName, defaultBranch, status: "PENDING" },
+    data: {
+      githubRepoId,
+      installationId,
+      owner,
+      name,
+      fullName,
+      defaultBranch,
+      status: "PENDING",
+    },
   });
 
   await enqueueIngestion({

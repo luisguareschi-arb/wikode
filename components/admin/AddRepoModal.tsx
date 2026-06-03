@@ -28,7 +28,12 @@ interface AddRepoModalProps {
   onAdded: () => void;
 }
 
-export function AddRepoModal({ open, installationId, onClose, onAdded }: AddRepoModalProps) {
+export function AddRepoModal({
+  open,
+  installationId,
+  onClose,
+  onAdded,
+}: AddRepoModalProps) {
   const [repos, setRepos] = useState<GithubRepo[]>([]);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(false);
@@ -68,7 +73,10 @@ export function AddRepoModal({ open, installationId, onClose, onAdded }: AddRepo
       await fetch("/api/repos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...repo, installationId: parseInt(installationId, 10) }),
+        body: JSON.stringify({
+          ...repo,
+          installationId: parseInt(installationId, 10),
+        }),
       });
     }
     setSaving(false);
@@ -92,9 +100,7 @@ export function AddRepoModal({ open, installationId, onClose, onAdded }: AddRepo
           </div>
         )}
 
-        {error && (
-          <p className="text-sm text-red-600">{error}</p>
-        )}
+        {error && <p className="text-sm text-red-600">{error}</p>}
 
         {!loading && !error && repos.length === 0 && (
           <p className="text-sm text-gray-500 py-4">No repositories found.</p>
@@ -115,7 +121,9 @@ export function AddRepoModal({ open, installationId, onClose, onAdded }: AddRepo
                 )}
                 <Github className="h-4 w-4 text-gray-500 shrink-0" />
                 <div>
-                  <p className="text-sm font-medium font-mono">{repo.fullName}</p>
+                  <p className="text-sm font-medium font-mono">
+                    {repo.fullName}
+                  </p>
                   <p className="text-xs text-gray-500">
                     {repo.private ? "Private" : "Public"} · {repo.defaultBranch}
                   </p>
@@ -131,7 +139,10 @@ export function AddRepoModal({ open, installationId, onClose, onAdded }: AddRepo
           </Button>
           <Button onClick={handleAdd} disabled={selected.size === 0 || saving}>
             {saving ? (
-              <><Loader2 className="h-4 w-4 mr-2 animate-spin" />Adding…</>
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Adding…
+              </>
             ) : (
               `Add ${selected.size > 0 ? `${selected.size} ` : ""}Repo${selected.size !== 1 ? "s" : ""}`
             )}

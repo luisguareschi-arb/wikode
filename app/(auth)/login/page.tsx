@@ -1,6 +1,12 @@
 import { signIn } from "@/lib/auth/config";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Github, Chrome } from "lucide-react";
 
 export default function LoginPage() {
@@ -11,7 +17,9 @@ export default function LoginPage() {
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[hsl(var(--app-text))]">
             <span className="text-xl font-bold text-white">W</span>
           </div>
-          <CardTitle className="text-2xl text-[hsl(var(--app-text))]">Sign in to Wikode</CardTitle>
+          <CardTitle className="text-2xl text-[hsl(var(--app-text))]">
+            Sign in to Wikode
+          </CardTitle>
           <CardDescription className="text-[hsl(var(--app-text-muted))]">
             AI chat for your private codebases
           </CardDescription>

@@ -6,7 +6,7 @@ import { getInstallationOctokit } from "@/lib/github/app";
 
 export async function POST(
   _req: NextRequest,
-  { params }: { params: Promise<{ repoId: string }> }
+  { params }: { params: Promise<{ repoId: string }> },
 ) {
   const session = await auth();
   // @ts-expect-error role is custom
